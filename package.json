@@ -1,0 +1,54 @@
+{
+  "name": "maptool-script",
+  "displayName": "MapTool-Script Support",
+  "description": "Syntax highlighting support for the old MapTool scripting language",
+  "version": "0.0.1",
+  "repository": {
+    "url" : "https://github.com/Daedeross/maptool-script.vscode"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "mts",
+        "aliases": [
+          "MapTool Script",
+          "mts"
+        ],
+        "extensions": [
+          ".mts"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mts",
+        "scopeName": "source.mts",
+        "path": "./syntaxes/mts.tmLanguage.json"
+      }
+    ],
+    "configurationDefaults": {
+      "editor.tokenColorCustomizations": {
+        "textMateRules": [
+          {
+            "scope": [
+              "entity.name.function.built-in"
+            ],
+            "settings": {
+              "fontStyle": "bold"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "py build-grammar.py syntaxes\\mts.tmLanguage.yaml syntaxes\\mts.tmLanguage.json"
+  }
+}
