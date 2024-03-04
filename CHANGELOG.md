@@ -15,5 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - MapTool script language support
-- TextMate gramamr file for MapTool script Syntax Highlighting
+- TextMate grammar file for MapTool script Syntax Highlighting
+- Script to convert YAML w/variables to JSON.
 - `configuration` contribution to set built-in functions to render **bold**
+- Readme w/Sample Images
+- LICENSE
+- Extension Logo Icon
