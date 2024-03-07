@@ -8,7 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - ANTL4 Grammar file for MTScript
-- Operator highlighting
+
+## [0.1.0]
+
+### Added
+
+- Binary expression tokenization
+- Support for RPEdit formats
+  - Macro Name scoped to `entity.name.class.mts`
+  - `@PROPS@` tokenized
+    - Valid prop keys  scoped to `support.variable.mts`
+  - Folding for RPEdit format which closes with `!!`
+
+### Changed
+
+- Built-in function names' scope changed from `entity.name.function.built-in.mts`
+to `support.function.mts`
+
+### Fixed
+
+- Some typos in operator Regexes
+- Some edge-cases when ',' or ']' appear in strings.
 
 ## [0.0.1]
 

@@ -12,6 +12,7 @@ Basic syntax highlighting for MapTool script.
 * Special variables.
 * Separate scopes for built-in vs user-defined fuctions.
   * By default built-in functions are bold, but that can be customized by theme.
+* RPEdit formatting support.
 
 ![Multi-part example](images/multi-part-macro.png)
 
