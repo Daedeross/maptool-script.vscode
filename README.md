@@ -43,3 +43,4 @@ Planned features
   * Hover-text of built-in functions
   * Recognizing variables
   * Tracking UDFs
+  * FoldingRangeProvider
