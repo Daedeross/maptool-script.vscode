@@ -3,7 +3,7 @@
   "displayName": "MapTool-Script Support",
   "description": "Syntax highlighting support for the old MapTool scripting language",
   "icon": "images/logo.png",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "bryan-c-jones",
   "repository": {
     "url" : "https://github.com/Daedeross/maptool-script.vscode"
@@ -40,7 +40,8 @@
         "textMateRules": [
           {
             "scope": [
-              "entity.name.function.built-in"
+              "entity.name.function.built-in.mts",
+              "support.function.mts"
             ],
             "settings": {
               "fontStyle": "bold"
