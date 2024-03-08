@@ -7,34 +7,23 @@
     "uuid": "44e8b0bb-5bab-47c6-bc66-e2bd33e1a0b7",
     "patterns": [
         {
-            "include": "#one-line-macro"
+            "include": "#rpedit"
         },
         {
-            "include": "#multi-line-macro-code"
-        },
-        {
-            "include": "#multi-line-macro"
+            "include": "#macro"
         }
     ],
     "repository": {
         "macro": {
-            "name": "meta.macro.mts",
-            "begin": "\\[",
-            "beginCaptures": {
-                "0": {
-                    "name": "meta.control.flow.start.mts"
-                }
-            },
-            "end": "](?!.*\")",
-            "endCaptures": {
-                "0": {
-                    "name": "keyword.control.flow.end.mts"
-                }
-            },
-            "contentName": "meta.macro.inside.mts",
             "patterns": [
                 {
-                    "include": "#macro-with-roll-options"
+                    "include": "#one-line-macro"
+                },
+                {
+                    "include": "#multi-line-macro-code"
+                },
+                {
+                    "include": "#multi-line-macro"
                 }
             ]
         },
@@ -192,23 +181,21 @@
             }
         },
         "expression": {
-            "name": "expression.mts",
-            "match": "(.+)",
-            "captures": {
-                "0": {
-                    "patterns": [
-                        {
-                            "include": "#function-call"
-                        },
-                        {
-                            "include": "#literal-expression"
-                        },
-                        {
-                            "include": "#variable-expression"
-                        }
-                    ]
+            "name": "meta.expression",
+            "patterns": [
+                {
+                    "include": "#function-call"
+                },
+                {
+                    "include": "#binary-expression"
+                },
+                {
+                    "include": "#variable-expression"
+                },
+                {
+                    "include": "#literal-expression"
                 }
-            }
+            ]
         },
         "variable-expression": {
             "name": "variable.parameter.mts",
@@ -233,10 +220,10 @@
             "name": "expression.literal.mts",
             "patterns": [
                 {
-                    "include": "#numeric-literal"
+                    "include": "#string"
                 },
                 {
-                    "include": "#string"
+                    "include": "#numeric-literal"
                 }
             ]
         },
@@ -323,7 +310,7 @@
         },
         "function-call": {
             "name": "expression.function.mts",
-            "match": "([\\w\\.]+)(\\()(.*)\\)(?!.*\")",
+            "match": "\\s*([\\w\\.]+)(\\()(.*)\\)(?!.*\")",
             "captures": {
                 "1": {
                     "patterns": [
@@ -338,19 +325,53 @@
                 "3": {
                     "patterns": [
                         {
-                            "include": "#expression"
+                            "include": "#args"
                         }
                     ]
                 }
             }
         },
         "built-in-function": {
-            "name": "entity.name.function.built-in.mts",
+            "name": "support.function.mts",
             "match": "\\b(abort|abs|absolutevalue|add|addAllNPCsToInitiative|addAllPCsToInitiative|addAllToInitiative|addTableEntry|addToInitiative|and|arg|argCount|arsMagicaStress|arsMagicaStressNum|assert|average|avg|band|bar\\.name|base64\\.decode|base64\\.encode|bitwiseand|bitwisenot|bitwiseor|bitwisexor|bnot|bor|bringDrawingToFront|bringToFront|broadcast|bxor|canSeeToken|capitalize|ceil|ceiling|clearLights|clearRolls|clearTable|closeDialog|closeFrame|closeOverlay|concat|copyMap|copyTable|copyToken|countStrProp|countsuccess|createMacro|createMap|createTable|createToken|createTokens|currentToken|d|data\\.getData|data\\.getStaticData|data\\.listData|data\\.listNamespaces|data\\.listTypes|data\\.removeData|data\\.setData|decode|defineAudioSource|defineFunction|deleteStrProp|deleteTable|deleteTableEntry|deselectTokens|dice|divide|drawCoverVBL|drawHillVBL|drawMBL|drawPitVBL|drawVBL|drop|dropHighest|editStream|encode|endsWith|eq|eqs|equals|equalsStrict|eraseCoverVBL|eraseHillVBL|eraseMBL|erasePitVBL|eraseVBL|eval|evalMacro|execFunction|execLink|execMacro|explode|explodingSuccess|exportData|exposeAllOwnedArea|exposeAllOwnedAreas|exposeFogAtWaypoints|exposeFOW|exposePCOnlyArea|f|fetch|findDrawings|findToken|flipTokenIso|flipTokenX|flipTokenY|floor|formatStrProp|fudge|ge|getAllMapDisplayNames|getAllMapIDs|getAllMapNames|getAllowsURIAccess|getAllPlayerNames|getAllPropertyNames|getAlwaysVisible|getAssetProperties|getBar|getBarImage|getCoverVBL|getCurrentInitiative|getCurrentMapID|getCurrentMapName|getDefaultPropertyType|getDefinedFunctions|getDialogProperties|getDistance|getDistanceToXY|getDrawingEraser|getDrawingInfo|getDrawingLayer|getDrawingOpacity|getDrawingProperties|getEnvironmentVariable|getExposedTokenNames|getExposedTokens|getFillColor|getFindCount|getFrameProperties|getGMName|getGMNotes|getGroup|getGroupCount|getGroupEnd|getGroupStart|getHalo|getHillVBL|getImage|getImpersonated|getImpersonatedName|getInfo|getInitiative|getInitiativeHold|getInitiativeList|getInitiativeRound|getInitiativeToken|getLabel|getLastPath|getLayer|getLibProperty|getLibPropertyNames|getLights|getLineCap|getMacroButtonIndex|getMacroCommand|getMacroContext|getMacroGroup|getMacroIndexes|getMacroLocation|getMacroName|getMacroProps|getMacros|getMapDisplayName|getMapIDs|getMapName|getMapVisible|getMapVision|getMatchingLibProperties|getMatchingProperties|getMaxLoopIterations|getMaxRecursionDepth|getMBL|getMoveCount|getMoveLock|getName|getNewRolls|getNotes|getNPC|getNPCNames|getOverlayProperties|getOwned|getOwnedNames|getOwnerOnlyVisible|getOwners|getPC|getPCNames|getPenColor|getPenWidth|getPitVBL|getPlayerName|getProperty|getPropertyDefault|getPropertyDisplayName|getPropertyNames|getPropertyNamesRaw|getPropertyType|getRawProperty|getRecursionDepth|getRolled|getSelected|getSelectedNames|getSightType|getSize|getSoundProperties|getSpeech|getSpeechNames|getState|getStateImage|getStrProp|getTableAccess|getTableEntry|getTableImage|getTableNames|getTablePickOnce|getTablePicksLeft|getTableRoll|getTableVisible|getTerrainModifier|getTextLabelStatus|getTokenCoverVBL|getTokenDrawOrder|getTokenFacing|getTokenGMName|getTokenHalo|getTokenHandout|getTokenHeight|getTokenHillVBL|getTokenImage|getTokenLabel|getTokenLayoutProps|getTokenMap|getTokenMBL|getTokenName|getTokenNames|getTokenNativeHeight|getTokenNativeWidth|getTokenOpacity|getTokenPitVBL|getTokenPortrait|getTokenRotation|getTokens|getTokenShape|getTokenStates|getTokenVBL|getTokenWidth|getTokenX|getTokenY|getVBL|getViewArea|getViewCenter|getVisible|getVisibleMapDisplayNames|getVisibleMapNames|getVisibleTokenNames|getVisibleTokens|getWithState|getWithStateNames|getZoom|goto|gt|hasImpersonated|hasLightSource|hasMacro|hasProperty|hasSight|hero|herobody|herokilling|herokilling2|herolab\\.getImage|herolab\\.getInfo|herolab\\.getMasterName|herolab\\.getStatBlock|herolab\\.hasChanged|herolab\\.isMinion|herolab\\.refresh|herolab\\.XPath|heromultiplier|herostun|hex|hideTextLabels|html\\.dialog|html\\.dialog5|html\\.frame|html\\.frame5|html\\.overlay|hypot|hypotenuse|if|impersonate|indexKeyStrProp|indexOf|indexValueStrProp|initiativeSize|input|isBarVisible|isDialogVisible|isExternalMacroAccessAllowed|isFlippedIso|isFlippedX|isFlippedY|isFrameVisible|isFunctionDefined|isGM|isNPC|isNumber|isOverlayRegistered|isOverlayVisible|isOwnedByAll|isOwner|isPC|isPropertyEmpty|isSnapToGrid|isTrusted|isVisible|js\\.createNS|js\\.eval|js\\.evalNS|js\\.evalURI|js\\.removeNS|js:MapTool\\.chat|js:MapTool\\.clientInfo|js:MapTool\\.tokens|js:MTScript|js:Token|json\\.append|json\\.contains|json\\.count|json\\.difference|json\\.equals|json\\.evaluate|json\\.false|json\\.fields|json\\.fromList|json\\.fromStrProp|json\\.get|json\\.indent|json\\.indexOf|json\\.intersection|json\\.isEmpty|json\\.isSubset|json\\.length|json\\.merge|json\\.null|json\\.objrolls|json\\.path\\.add|json\\.path\\.delete|json\\.path\\.put|json\\.path\\.read|json\\.path\\.set|json\\.remove|json\\.removeAll|json\\.removeFirst|json\\.reverse|json\\.rolls|json\\.set|json\\.shuffle|json\\.sort|json\\.toList|json\\.toStrProp|json\\.toVars|json\\.true|json\\.type|json\\.union|json\\.unique|keep|keepLowest|killing|lastIndexOf|le|length|library\\.getContents|library\\.getInfo|library\\.listAddOnLibraries|library\\.listTokenLibraries|listAppend|listContains|listCount|listDelete|listFind|listFormat|listGet|listInsert|listReplace|listSort|ln|log|log\\.debug|log\\.error|log\\.fatal|log\\.getLoggers|log\\.info|log\\.setLevel|log\\.trace|log\\.warn|log10|lower|lt|macro\\.args|macro\\.catchAbort|macro\\.catchAssert|macro\\.requestHeaders|macro\\.responseHeaders|macro\\.return|macroLink|macroLinkText|macros:regularexpression|markdownToHTML|matches|math|math\\.abs|math\\.acos|math\\.acosr|math\\.arrayMax|math\\.arrayMean|math\\.arrayMedian|math\\.arrayMin|math\\.arrayProduct|math\\.arraySum|math\\.asin|math\\.asinr|math\\.atan|math\\.atanr|math\\.atan2|math\\.atan2r|math\\.cbrt|math\\.ceil|math\\.cos|math\\.cosr|math\\.cuberoot|math\\.e|math\\.floor|math\\.hypot|math\\.hypotenuse|math\\.isEven|math\\.isInt|math\\.isOdd|math\\.listMax|math\\.listMean|math\\.listMedian|math\\.listMin|math\\.listProduct|math\\.listSum|math\\.log|math\\.log10|math\\.max|math\\.min|math\\.mod|math\\.pi|math\\.pow|math\\.sin|math\\.sinr|math\\.sqrt|math\\.squareroot|math\\.tan|math\\.tanr|math\\.toDegrees|math\\.toRadians|max|mean|median|min|movedOverDrawing|movedOverPoints|movedOverToken|moveToken|moveTokenFromMap|moveTokenToMap|multiplier|multiply|ne|nextInitiative|not|number|oldFunction|onCampaignLoad|onChangeImpersonated|onChangeMap|onChangeSelection|onChangeToken|onInitiativeChange|onInitiativeChangeRequest|onMouseOver|onMouseOverEvent|onMultipleTokensMove|onTokenMove|openTest|or|playClip|player\\.getConnectedPlayers|player\\.getInfo|player\\.getName|player\\.getPlayers|playStream|pow|power|prevInitiative|refreshDrawing|removeAllFromInitiative|removeAllNPCsFromInitiative|removeAllPCsFromInitiative|removeDrawing|removeFromInitiative|removeMacro|removeToken|removeTokenFacing|replace|reroll|rerollOnce|resetFrame|resetProperty|resetSize|resetTablePicks|REST\\.delete|REST\\.get|REST\\.patch|REST\\.post|REST\\.put|restoreFoW|return|roll|roll\\.count|roll\\.result|rollAddWithLower|rollAddWithUpper|rollSubWithLower|rollSubWithUpper|rollWithLower|rollWithUpper|round|runJsFunction|selectTokens|sendDrawingToBack|sendToBack|server\\.isHosting|server\\.isPersonal|server\\.isServer|set|setAllowsURIAccess|setAllStates|setAlwaysVisible|setBar|setBarVisible|setCurrentInitiative|setCurrentMap|setDrawingEraser|setDrawingLayer|setDrawingName|setDrawingOpacity|setDrawingProperties|setFillColor|setGMName|setGMNotes|setHalo|setHasSight|setInitiative|setInitiativeHold|setInitiativeRound|setLabel|setLayer|setLibProperty|setLight|setLineCap|setMacroCommand|setMacroProps|setMapDisplayName|setMapName|setMapVisible|setMapVision|setMaxLoopIterations|setMaxRecursionDepth|setMoveLock|setName|setNotes|setNPC|setOverlayVisible|setOwnedByAll|setOwner|setOwnerOnlyVisible|setPC|setPenColor|setPenWidth|setProperty|setPropertyType|setSightType|setSize|setSpeech|setState|setStrProp|setTableAccess|setTableEntry|setTableImage|setTablePickOnce|setTableRoll|setTableVisible|setTerrainModifier|setTokenCoverVBL|setTokenDrawOrder|setTokenFacing|setTokenGMName|setTokenHandout|setTokenHeight|setTokenHillVBL|setTokenImage|setTokenLabel|setTokenLayoutProps|setTokenMBL|setTokenOpacity|setTokenPitVBL|setTokenPortrait|setTokenShape|setTokenSnapToGrid|setTokenVBL|setTokenWidth|setViewArea|setVisible|setZoom|setZoomLock|showTextLabels|sortInitiative|sqr|sqrt|square|squareroot|sr4|sr4e|sr5|sr5e|startsWith|state\\.name|stopSound|strEquals|strfind|strformat|string|stringToList|strPropFromVars|substring|subtract|success|sum|switchToken|table|tableImage|tbl|tblImage|toggleFoW|token\\.gmname|token\\.halo|token\\.init|token\\.initHold|token\\.label|token\\.name|token\\.visible|tokens\\.denyMove|tokens\\.moveCount|transferCoverVBL|transferHillVBL|transferMBL|transferPitVBL|transferVBL|trim|true|u|ubiquity|upper|varsFromStrProp|XMLHttpRequest)\\b"
         },
         "user-defined-function": {
             "name": "entity.name.function.user-defined.mts",
             "match": "([_[:alpha:]]\\w*)"
+        },
+        "args": {
+            "patterns": [
+                {
+                    "include": "#string"
+                },
+                {
+                    "include": "#args-list"
+                },
+                {
+                    "include": "#expression"
+                }
+            ]
+        },
+        "args-list": {
+            "name": "meta.args-list.mts",
+            "match": "\\s*([^,]*)\\s*,\\s*(.+)",
+            "captures": {
+                "1": {
+                    "patterns": [
+                        {
+                            "include": "#expression"
+                        }
+                    ]
+                },
+                "2": {
+                    "name": "meta.args.more",
+                    "patterns": [
+                        {
+                            "include": "#args"
+                        }
+                    ]
+                }
+            }
         },
         "string": {
             "patterns": [
@@ -414,7 +435,125 @@
         },
         "binary-expression": {
             "name": "meta.expression.binary.mts",
-            "match": "(.+)(+|-|\\*|/|<|>|<=|>=|!=)(.+)"
+            "match": "(.+?)(\\+|-|\\*|/|<|>|<=|>=|!=)(.+)",
+            "captures": {
+                "1": {
+                    "patterns": [
+                        {
+                            "include": "#expression"
+                        }
+                    ]
+                },
+                "2": {
+                    "name": "keyword.operator.mts"
+                },
+                "3": {
+                    "patterns": [
+                        {
+                            "include": "#expression"
+                        }
+                    ]
+                }
+            }
+        },
+        "rpedit": {
+            "name": "meta.macro.rpedit.mts",
+            "patterns": [
+                {
+                    "include": "#rpedit-collapsible"
+                },
+                {
+                    "include": "#rpedit-single"
+                }
+            ]
+        },
+        "rpedit-single": {
+            "begin": "^(@@)[@\\s]*(.+)",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.mts"
+                },
+                "2": {
+                    "name": "entity.name.class.mts"
+                }
+            },
+            "end": "^(?@@)",
+            "patterns": [
+                {
+                    "include": "#rpedit-props"
+                },
+                {
+                    "include": "#macro"
+                }
+            ]
+        },
+        "rpedit-collapsible": {
+            "begin": "^(@@)[@\\s]*(.+)",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.mts"
+                },
+                "2": {
+                    "name": "entity.name.class.mts"
+                }
+            },
+            "end": "^!!$",
+            "endCaptures": {
+                "0": {
+                    "name": "keyword.control.mts"
+                }
+            },
+            "patterns": [
+                {
+                    "include": "#rpedit-props"
+                },
+                {
+                    "include": "#macro"
+                }
+            ]
+        },
+        "rpedit-props": {
+            "name": "meta.maco.rpedit.props.mts",
+            "match": "(@PROPS@)\\s+(.+)",
+            "captures": {
+                "1": {
+                    "name": "storage.type.mts"
+                },
+                "2": {
+                    "name": "meta.prop-list.mts",
+                    "patterns": [
+                        {
+                            "include": "#prop-list"
+                        }
+                    ]
+                }
+            }
+        },
+        "prop-list": {
+            "name": "meta.macro.prop-list.mts",
+            "match": "\\b(applyToSelected|autoExecute|color|command|fontColor|fontSize|includeLabel|group|sortBy|label|maxWidth|minWidth|playerEditable|tooltip|compare)\\b(=)([^;]+)((;)(.+))?",
+            "captures": {
+                "1": {
+                    "name": "support.variable.mts"
+                },
+                "2": {
+                    "name": "keyword.operator.mts"
+                },
+                "3": {
+                    "name": "meta.props.value.mts"
+                },
+                "5": {
+                    "name": "punctuation.separator.semicolon.mts"
+                },
+                "6": {
+                    "name": "meta.props.more",
+                    "patterns": [
+                        {
+                            "include": "#prop-list"
+                        }
+                    ]
+                }
+            }
         }
     }
 }

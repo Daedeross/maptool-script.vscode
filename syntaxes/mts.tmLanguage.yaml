@@ -24,7 +24,7 @@ variables:
   statementEnd: (?=\])
   beforeColon: (?=:)
   afterColon: (?<=:)
-  binaryOperator: (+|-|\*|/|<|>|<=|>=|!=)
+  binaryOperator: (\+|-|\*|/|<|>|<=|>=|!=)
   rollOptionSimple: \b(e|expanded|g|gm|gmtt|gt|h|hidden|hide|r|result|s|self|selftt|st|t|tooltip|u|unformatted)\b
   rollOptionWithArgs: \b(c|count|dialog|dialog5|for|foreach|frame|frame5|if|macro|overlay|switch|token|w|while|whisper)\b
   code: \b(?i)(code)(?-i)\b
@@ -99,29 +99,19 @@ variables:
     |tableImage|tbl|tblImage|toggleFoW|token\\.gmname|token\\.halo|token\\.init|token\\.initHold|token\\.label|token\\.name|token\\.visible\
     |tokens\\.denyMove|tokens\\.moveCount|transferCoverVBL|transferHillVBL|transferMBL|transferPitVBL|transferVBL|trim|true|u|ubiquity|upper\
     |varsFromStrProp|XMLHttpRequest)\\b"
+  macroProp: "\
+    \\b(applyToSelected|autoExecute|color|command|fontColor|fontSize|includeLabel\
+    |group|sortBy|label|maxWidth|minWidth|playerEditable|tooltip|compare)\\b"
 
 patterns:
-  # - include: "#macro"
-  - include: "#one-line-macro"
-  - include: "#multi-line-macro-code"
-  - include: "#multi-line-macro"
+  - include: '#rpedit'
+  - include: "#macro"
 repository:
   macro:
-    name: meta.macro.mts
-    begin: \[
-    beginCaptures:
-      '0': { name: meta.control.flow.start.mts }
-    end: '](?!.*")'
-    endCaptures:
-      '0': { name: keyword.control.flow.end.mts }
-    contentName: meta.macro.inside.mts
     patterns:
-    - include: '#macro-with-roll-options'
-    # - include: '#unary-macro'
-    # - include: '#binary-macro'
-  # all:
-  #   name: meta.macro.inside.mts
-  #   match: .+
+    - include: '#one-line-macro'
+    - include: '#multi-line-macro-code'
+    - include: '#multi-line-macro'
   one-line-macro:
     name: meta.macro.single.mts
     match: '(\[.+])' # (?!.*")'
@@ -201,15 +191,12 @@ repository:
         patterns:
         - include: '#expression'
   expression:
-    name: expression.mts
-    match: (.+)
-    captures:
-      '0':
-        patterns:
-        - include: '#function-call'
-        # - include: '#binary-expression'
-        - include: '#literal-expression'
-        - include: '#variable-expression'
+    name: meta.expression
+    patterns:
+    - include: '#function-call'
+    - include: '#binary-expression'
+    - include: '#variable-expression'
+    - include: '#literal-expression'
   variable-expression:
     name: variable.parameter.mts
     patterns:
@@ -224,8 +211,8 @@ repository:
   literal-expression:
     name: expression.literal.mts
     patterns:
-    - include: '#numeric-literal'
     - include: '#string'
+    - include: '#numeric-literal'
   numeric-literal:
     patterns:
     - name: constant.numeric.hex.mts
@@ -259,7 +246,7 @@ repository:
         '14': { name: storage.type.numeric.bigint.mts }
   function-call:
     name: expression.function.mts
-    match: ([\w\.]+)(\()(.*)\)(?!.*")
+    match: \s*([\w\.]+)(\()(.*)\)(?!.*")
     captures:
       '1': 
         patterns:
@@ -267,13 +254,29 @@ repository:
         - include: '#user-defined-function'
       '3':
         patterns:
-        - include: '#expression'
+        - include: '#args'
   built-in-function:
-    name: entity.name.function.built-in.mts
+    name: support.function.mts
     match: ${{builtInFuction}}
   user-defined-function:
     name: entity.name.function.user-defined.mts
     match: ${{identifier}}
+  args:
+    patterns:
+    - include: '#string'
+    - include: '#args-list'
+    - include: '#expression'
+  args-list:
+    name: meta.args-list.mts
+    match: \s*([^,]*)\s*,\s*(.+)
+    captures:
+      '1':
+        patterns:
+        - include: '#expression'
+      '2':
+        name: meta.args.more
+        patterns:
+        - include: '#args'
   string:
     patterns:
     - include: '#qstring-single'
@@ -306,4 +309,61 @@ repository:
 
   binary-expression:
     name: meta.expression.binary.mts
-    match: (.+)${{binaryOperator}}(.+)
+    match: (.+?)${{binaryOperator}}(.+)
+    captures:
+      '1':
+        patterns:
+        - include: '#expression'
+      '2': { name: keyword.operator.mts }
+      '3':
+        patterns:
+        - include: '#expression'
+
+  rpedit:
+    name: meta.macro.rpedit.mts
+    patterns:
+    - include: '#rpedit-collapsible'
+    - include: '#rpedit-single'
+  rpedit-single:
+    begin: '^(@@)[@\s]*(.+)'
+    beginCaptures:
+      '1': { name: keyword.control.mts }
+      '2': { name: entity.name.class.mts }
+    end: ^(?@@)
+    patterns:
+    - include: '#rpedit-props'
+    - include: '#macro'
+  rpedit-collapsible:
+    begin: '^(@@)[@\s]*(.+)'
+    beginCaptures:
+      '1': { name: keyword.control.mts }
+      '2': { name: entity.name.class.mts }
+    end: '^!!$'
+    endCaptures:
+      '0': { name: keyword.control.mts }
+    patterns:
+    - include: '#rpedit-props'
+    - include: '#macro'
+
+  rpedit-props:
+    name: meta.maco.rpedit.props.mts
+    match: '(@PROPS@)\s+(.+)'
+    captures:
+      '1': { name: storage.type.mts }
+      '2':
+        name: meta.prop-list.mts
+        patterns:
+        - include: '#prop-list'
+
+  prop-list:
+    name: meta.macro.prop-list.mts
+    match: '${{macroProp}}(=)([^;]+)((;)(.+))?'
+    captures:
+      '1': { name: support.variable.mts }
+      '2': { name: keyword.operator.mts }
+      '3': { name: meta.props.value.mts }
+      '5': { name: punctuation.separator.semicolon.mts }
+      '6':
+        name: meta.props.more
+        patterns:
+        - include: '#prop-list'
