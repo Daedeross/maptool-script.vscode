@@ -13,6 +13,14 @@
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "preLaunchTask": "parseyaml"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Server",
+            "program": "${workspaceFolder}/server/src/useit.ts",
+            //"preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/server/out/**/*.js"]
         }
     ]
 }
