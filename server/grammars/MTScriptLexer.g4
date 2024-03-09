@@ -8,7 +8,7 @@ OPEN_SCRIPT
 TEXT
     : .+?;
 
-DWS : [ \t\r\n\u000C]+  -> channel(HIDDEN);
+DWS : [ \t\r\n\u000C]+  -> channel(HIDDEN); // ignore whitespace outside scripts
 
 mode SCRIPT;
 
@@ -80,14 +80,11 @@ KEYWORD_UNFORMATTED : 'unformatted' | 'u';
 KEYWORD_WHILE       : 'while';
 KEYWORD_WHISPER     : 'whisper' | 'w';
 
-WS           : [ \t\r\n\u000C]+  -> channel(HIDDEN);
+WS           : [ \t\r\n\u000C]+  -> channel(HIDDEN);     // ignore whitespace inside scripts
 
-// Identifiers
 IDENTIFIER : VALID_ID_START VALID_ID_CHAR* ;
 
 // LITERALS
-//STRING : '"' ~'"'* '"' -> pushMode(STRING_MODE) ;
-
 INT
     : Digit+
     ;
@@ -107,7 +104,6 @@ HEX_FLOAT
     | '0' [x] '.' HexDigit+ HexExponentPart?
     | '0' [x] HexDigit+ HexExponentPart
     ;
-
 
 fragment VALID_ID_START : Letter;
 fragment VALID_ID_CHAR  : VALID_ID_START | ('0' .. '9') ;
