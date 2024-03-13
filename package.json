@@ -52,6 +52,6 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "python build-grammar.py syntaxes\\mts.tmLanguage.yaml syntaxes\\mts.tmLanguage.json"
+    "vscode:prepublish": "python build-grammar.py syntaxes/mts.tmLanguage.yaml syntaxes/mts.tmLanguage.json"
   }
 }
