@@ -9,19 +9,31 @@
     "type": "git",
     "url": "https://github.com/Daedeross/maptool-script.vscode"
   },
+  "engines": {
+    "node": "*"
+  },
   "dependencies": {
+    "lodash": "^4.17.21",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11"
   },
   "scripts": {
     "antlr": "npm run lexer && npm run parser",
     "lexer": "antlr4 -Dlanguage=TypeScript grammars/MTScriptLexer.g4 -o src/grammars",
-    "parser": "antlr4 -Dlanguage=TypeScript grammars/MTScriptParser.g4 -visitor -no-listener -o src/grammars -lib src/grammars"
+    "parser": "antlr4 -Dlanguage=TypeScript grammars/MTScriptParser.g4 -visitor -no-listener -o src/grammars -lib src/grammars",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.0",
+    "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.25",
+    "@types/vscode": "^1.87.0",
     "@vscode/test-cli": "^0.0.6",
     "@vscode/test-electron": "^2.3.9",
-    "antlr4": "^4.13.1-patch-1"
+    "antlr4": "^4.13.1-patch-1",
+    "mocha": "^10.3.0",
+    "ts-node": "^10.9.2"
   }
 }

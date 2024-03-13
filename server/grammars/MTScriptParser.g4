@@ -7,7 +7,8 @@ macro
     ;
 
 bit
-    : TEXT | macroScript
+    : TEXT
+    | macroScript
     ;
 
 macroScript
@@ -15,11 +16,11 @@ macroScript
     ;
 
 script
-    : switchCode
-    | switch
-    | ifThen
-    | ifThenCode
-    | simpleScript
+    : switchCode        #switchCodeScript
+    | switch            #switchScript
+    | ifThen            #ifThenScript
+    | ifThenCode        #ifThenCodeScript
+    | simpleScript      #simple
     ;
 
 simpleScript
@@ -28,25 +29,25 @@ simpleScript
 
 ifThen
     : (rollOptions COMMA)? KEYWORD_IF LPAREN expression RPAREN
-      rollOptions? COLON statement SEMI statement
+      rollOptions? COLON true=statement SEMI false=statement
     ;
 
 ifThenCode
     : (rollOptions COMMA)? KEYWORD_IF LPAREN expression RPAREN
-      rollOptions? COMMA KEYWORD_CODE COLON block SEMI block
+      rollOptions? COMMA KEYWORD_CODE COLON true=block SEMI false=block
     ;
 
 switch
-    : (rollOptions COMMA)? KEYWORD_SWITCH
+    : (first=rollOptions COMMA)? KEYWORD_SWITCH
       LPAREN expression RPAREN
-      rollOptions? COLON
+      second=rollOptions? COLON
       switchBody
     ;
 
 switchCode
-    : (rollOptions COMMA)? KEYWORD_SWITCH
+    : (first=rollOptions COMMA)? KEYWORD_SWITCH
       LPAREN expression RPAREN COMMA KEYWORD_CODE COLON
-      switchCodeBody
+      second=switchCodeBody
     ;
 
 switchBody
@@ -66,10 +67,6 @@ switchCodeCase
     ;
 
 rollOptions
-    : optionsList
-    ;
-
-optionsList
     : option (COMMA option)*
     ;
 
@@ -106,11 +103,17 @@ function_option
     | KEYWORD_WHISPER
     ;
 
-scriptBody      : statement
-                | block;
+scriptBody
+    : statement
+    | block
+    ;
 
 block
     : LBRACE scripts RBRACE
+    ;
+
+scripts
+    : bit+
     ;
 
 statement
@@ -118,26 +121,22 @@ statement
     | expression
     ;
 
-scripts
-    : bit+
-    ;
-
 assignment
     : variable ASSIGN expression
     ;
 
 expression
-    : LPAREN expression RPAREN                                      #parentheticalExpression
-    | function                                                      #functionCall
-    | atom                                                          #atomicExpression
-    | expression POW expression                                     #powerExpression
-    | op=(PLUS | MINUS) expression                                  #numericUnaryExpression
-    | expression op=(TIMES | DIV) expression                        #mulDivExpression
-    | expression op=(PLUS | MINUS) expression                       #addSubExpression
-    | NOT expression                                                #booleanUnaryExpression
-    | expression op=(GT | LT | EQ | NEQ | GEQ | LEQ) expression     #comparisonExpression
-    | expression op=(AND | OR) expression                           #booleanBinaryExpression
-    | expression QMARK expression COLON expression                  #ternaryExpression
+    : LPAREN expression RPAREN                                              #parentheticalExpression
+    | function                                                              #functionCall
+    | atom                                                                  #atomicExpression
+    | left=expression POW right=expression                                  #powerExpression
+    | op=(PLUS | MINUS) right=expression                                    #numericUnaryExpression
+    | left=expression op=(TIMES | DIV) right=expression                     #mulDivExpression
+    | left=expression op=(PLUS | MINUS) right=expression                    #addSubExpression
+    | NOT expression                                                        #booleanUnaryExpression
+    | left=expression op=(GT | LT | EQ | NEQ | GEQ | LEQ) right=expression  #comparisonExpression
+    | left=expression op=(AND | OR) right=expression                        #booleanBinaryExpression
+    //| predicate=expression QMARK true=expression COLON false=expression     #ternaryExpression
     ;
 
 atom : numeric_literal | boolean_literal | string_literal | variable ;
@@ -146,7 +145,7 @@ numeric_literal : (INT | HEX | FLOAT | HEX_FLOAT) ;
 boolean_literal : KEYWORD_TRUE | KEYWORD_FALSE ;
 
 function : variable LPAREN argList RPAREN ;
-argList : expression (COMMA expression)* ;
+argList : expression? (COMMA expression)* ;
 
 variable
     : identifier

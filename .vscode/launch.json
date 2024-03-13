@@ -3,7 +3,7 @@
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
-	"version": "0.2.0",
+    "version": "0.2.0",
     "configurations": [
         {
             "name": "Extension",
@@ -21,6 +21,34 @@
             "program": "${workspaceFolder}/server/src/useit.ts",
             //"preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": ["${workspaceFolder}/server/out/**/*.js"]
+        },
+        {
+            "type": "extensionHost",
+            "request": "launch",
+            "name": "Launch Client",
+            "runtimeExecutable": "${execPath}",
+            "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+            "outFiles": [
+                "${workspaceRoot}/client/out/**/*.js",
+                "${workspaceRoot}/server/out/**/*.js"
+            ],
+            "autoAttachChildProcesses": true,
+            "preLaunchTask": {
+                "type": "npm",
+                "script": "watch"
+            }
+        },
+        {
+            "name": "Launch TS File",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/server/src/useit.ts"
+            ]
         }
     ]
 }

@@ -9,12 +9,19 @@
     "type": "git",
     "url": "https://github.com/Daedeross/maptool-script.vscode"
   },
+	"keywords": [
+		"multi-root ready"
+	],
   "engines": {
     "vscode": "^1.75.0"
   },
+	"activationEvents": [
+		"onLanguage:plaintext"
+	],
   "categories": [
     "Programming Languages"
   ],
+	"main": "./client/out/extension",
   "contributes": {
     "languages": [
       {
@@ -37,6 +44,9 @@
       }
     ],
     "configurationDefaults": {
+      "[mts]": {
+        "editor.semanticHighlighting.enabled": true
+      },
       "editor.tokenColorCustomizations": {
         "textMateRules": [
           {
@@ -49,6 +59,29 @@
             }
           }
         ]
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Example configuration",
+      "properties": {
+        "languageServerExample.maxNumberOfProblems": {
+          "scope": "resource",
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "languageServerExample.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        }
       }
     }
   },

@@ -7,6 +7,34 @@
             "label": "parseyaml",
             "type": "shell",
             "command": "py build-grammar.py syntaxes\\mts.tmLanguage.yaml syntaxes\\mts.tmLanguage.json"
+        },
+        {
+            "type": "npm",
+            "script": "compile",
+            "group": "build",
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "never"
+            },
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "type": "npm",
+            "script": "watch",
+            "isBackground": true,
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "never"
+            },
+            "problemMatcher": [
+                "$tsc-watch"
+            ]
         }
     ]
 }

@@ -3,3 +3,4 @@ node_modules
 .antlr
 server/src/grammars
 **/out
+.vscode-test
