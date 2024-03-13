@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - ANTL4 Grammar file for MTScript
+- Language server w/client
+  - Sematic token
+  - Tree visitor
+  - Variable usage before assignment waring.
+
+## [0.1.1]
+
+### Fixed
+
+- Fixed omission in TextMate grammar causing statements without roll-options not highlighting.
 
 ## [0.1.0]
 

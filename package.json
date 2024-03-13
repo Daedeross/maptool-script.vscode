@@ -3,7 +3,7 @@
   "displayName": "MapTool-Script Support",
   "description": "Syntax highlighting support for the old MapTool scripting language",
   "icon": "images/logo.png",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "bryan-c-jones",
   "repository": {
     "url" : "https://github.com/Daedeross/maptool-script.vscode"
