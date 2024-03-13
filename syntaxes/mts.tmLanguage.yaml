@@ -119,6 +119,7 @@ repository:
       '1': # { name: meta.macro.1.inside.mts }
         patterns:
         - include: '#macro-with-roll-options'
+        - include: '#statement'
   multi-line-macro-code:
     name: meta.macro.multi.code.mts
     match: '(\[.+):\s*{\s*$'

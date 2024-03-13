@@ -35,6 +35,9 @@
                     "patterns": [
                         {
                             "include": "#macro-with-roll-options"
+                        },
+                        {
+                            "include": "#statement"
                         }
                     ]
                 }
