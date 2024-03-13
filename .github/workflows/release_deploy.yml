@@ -5,6 +5,8 @@ on:
       - "v*"
 jobs:
   build-package:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
