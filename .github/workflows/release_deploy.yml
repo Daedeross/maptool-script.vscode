@@ -15,6 +15,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+      - run: pip install PyYAML
       - name: Publish to Visual Studio Marketplace
         id: publishToVSCMarketplace
         uses: HaaLeo/publish-vscode-extension@v1.6.2
