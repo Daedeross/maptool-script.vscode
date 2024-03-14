@@ -1,5 +1,6 @@
-import { SemanticTokensBuilder, SemanticTokensLegend } from "vscode-languageserver";
-import { defaultTo, isNil } from "lodash";
+import { Diagnostic, DiagnosticSeverity, Position, Range, SemanticTokensBuilder, SemanticTokensLegend } from "vscode-languageserver";
+import { defaultTo, get, isNil, lowerCase } from "lodash";
+import { ParserRuleContext, Token } from "antlr4";
 
 import {
     AddSubExpressionContext,
@@ -13,6 +14,7 @@ import {
     BooleanUnaryExpressionContext,
     ComparisonExpressionContext,
     ExpressionContext,
+    For_optionContext,
     FunctionCallContext,
     FunctionContext,
     Function_optionContext,
@@ -42,11 +44,9 @@ import {
     SwitchCodeScriptContext,
     SwitchContext,
     SwitchScriptContext,
-    TernaryExpressionContext,
     VariableContext
 } from "./grammars/MTScriptParser";
 import MTScriptParserVisitor from "./grammars/MTScriptParserVisitor";
-import { Token } from "antlr4";
 
 export enum TokenType {
     string = 0,
@@ -83,9 +83,24 @@ const pushToken = (builder: SemanticTokensBuilder, token: Token | undefined, typ
     return builder;
 }
 
+const toPosition = (token: Token): Position => {
+    return {
+        line: token.line - 1,
+        character: token.column
+    }
+}
+
+const toRange = (ctx: ParserRuleContext): Range => {
+    let end = get(ctx, 'stop', ctx.start);
+    return {
+        start: toPosition(ctx.start),
+        end: { line: end.line - 1, character: end.column + end.text.length }
+    }
+}
+
 export interface VariableUsage {
     sets: Array<number>;
-    gets: Array<{position:number, length:number}>;
+    gets: Array<{ position: number, length: number }>;
 }
 
 const AddSet = (map: Map<string, VariableUsage>, name: string, position: number) => {
@@ -96,7 +111,7 @@ const AddSet = (map: Map<string, VariableUsage>, name: string, position: number)
 
 const AddGet = (map: Map<string, VariableUsage>, name: string, position: number, length: number) => {
     let usage = defaultTo(map.get(name), { sets: [], gets: [] });
-    usage.gets.push({position, length});
+    usage.gets.push({ position, length });
     map.set(name, usage);
 }
 
@@ -104,6 +119,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
 {
     private builder = new SemanticTokensBuilder();
     public vars = new Map<string, VariableUsage>();
+    public diagnostics: Array<Diagnostic> = [];
 
     getTokens = () => this.builder.build();
 
@@ -121,7 +137,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
     }
 
     // visitScript = (ctx: ScriptContext) => {
-
+    //     console.log('ms' + ctx.start.line );
     // }
 
     visitSwitchCodeScript = (ctx: SwitchCodeScriptContext) => { ctx.switchCode().accept(this); }
@@ -196,16 +212,24 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
     }
 
     visitRollOptions = (ctx: RollOptionsContext) => {
-
+        ctx.option_list().forEach(option => {
+            option.accept(this);
+        })
     }
 
     visitOption = (ctx: OptionContext) => {
         let simple = ctx.simple_option();
         if (isNil(simple)) {
-            this.visit(simple);
+            const function_option = ctx.function_option();
+            if (isNil(function_option)) {
+                console.log('for o:' + ctx.start.line);
+                this.visit(ctx.for_option());
+            } else {
+                this.visit(ctx.function_option());
+                this.visit(ctx.argList());
+            }
         } else {
-            this.visit(ctx.function_option());
-            this.visit(ctx.argList());
+            this.visit(simple);
         }
     }
 
@@ -223,10 +247,78 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
         this.builder.push(ctx.start.line, ch, length, TokenType.keyword, 0);
     }
 
+    visitFor_option = (ctx: For_optionContext) => {
+        pushToken(this.builder, ctx._for_, TokenType.keyword);
+
+        let args = ctx.expression_list();
+        let argCount = args.length;
+        if (!isNil(ctx._invalid)) {
+            const diagnostic: Diagnostic = {
+                severity: DiagnosticSeverity.Error,
+                range: toRange(ctx._invalid),
+                message: `The first argument to a for/foreach loop must be a variable declaration, found '${ctx._invalid.getText()}' instead.`,
+                source: 'mts:for_loop'
+            }
+            this.diagnostics.push(diagnostic);
+        }
+
+        const variable = ctx.variable();
+        if (!isNil(variable)) {
+            this.visit(variable);
+            AddSet(this.vars, variable.getText(), variable.start.start);
+            argCount++;
+        }
+
+        switch (lowerCase(ctx._for_.text)) {
+            case 'for': {
+                if (argCount < 3 || argCount > 5) {
+                    const diagnostic: Diagnostic = {
+                        severity: DiagnosticSeverity.Error,
+                        range: {
+                            start: toPosition(ctx.LPAREN().symbol),
+                            end: toPosition(ctx.RPAREN().symbol)
+                        },
+                        message: `Invalid number of arguments in 'for' statement. Expected 3-5 arguments.`,
+                        source: 'mts:for_loop'
+                    }
+                    this.diagnostics.push(diagnostic);
+                }
+                break;
+            }
+            case 'foreach': {
+                if (argCount < 3 || argCount > 4) {
+                    const diagnostic: Diagnostic = {
+                        severity: DiagnosticSeverity.Error,
+                        range: {
+                            start: toPosition(ctx.LPAREN().symbol),
+                            end: toPosition(ctx.RPAREN().symbol)
+                        },
+                        message: `Invalid number of arguments in 'foreach' statement. Expected 3-4 arguments.`,
+                        source: 'mts:foreach_loop'
+                    }
+                    this.diagnostics.push(diagnostic);
+                }
+                break;
+            }
+            default: {
+                console.warn("invalid token.");
+                break;
+            }
+        }
+        ctx.expression_list().forEach(element => {
+            this.visit(element);
+        });
+    }
+
     visitScriptBody = (ctx: ScriptBodyContext) => {
         const statement = ctx.statement();
         if (isNil(statement)) {
-            this.visit(ctx.block());
+            const block = ctx.block();
+            if (isNil(block)) {
+                console.warn("unreachable tree node?");
+            } else {
+                this.visit(ctx.block());
+            }
         } else {
             this.visit(statement);
         }
@@ -281,7 +373,8 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
         this.visit(ctx._right);
     }
     visitBooleanUnaryExpression = (ctx: BooleanUnaryExpressionContext) => {
-        this.visit(ctx.expression());}
+        this.visit(ctx.expression());
+    }
     visitComparisonExpression = (ctx: ComparisonExpressionContext) => {
         this.visit(ctx._left);
         this.visit(ctx._right);
@@ -303,8 +396,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
             if (isNil(numeric)) {
                 const bool = ctx.boolean_literal();
                 if (isNil(bool)) {
-                    console.log("string");
-                    this.builder.push(line, ch, text.length, TokenType.regexp, 0);
+                    this.builder.push(line, ch, text.length, TokenType.string, 0);
                 } else {
                     this.builder.push(line, ch, text.length, TokenType.keyword, 0);
                 }

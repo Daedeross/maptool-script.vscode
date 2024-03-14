@@ -3,25 +3,25 @@
   "displayName": "MapTool-Script Support",
   "description": "Syntax highlighting support for the old MapTool scripting language",
   "icon": "images/logo.png",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "publisher": "bryan-c-jones",
   "repository": {
     "type": "git",
     "url": "https://github.com/Daedeross/maptool-script.vscode"
   },
-	"keywords": [
-		"multi-root ready"
-	],
+  "keywords": [
+    "multi-root ready"
+  ],
   "engines": {
     "vscode": "^1.75.0"
   },
-	"activationEvents": [
-		"onLanguage:plaintext"
-	],
+  "activationEvents": [
+    "onLanguage:plaintext"
+  ],
   "categories": [
     "Programming Languages"
   ],
-	"main": "./client/out/extension",
+  "main": "./dist/client",
   "contributes": {
     "languages": [
       {
@@ -63,15 +63,15 @@
     },
     "configuration": {
       "type": "object",
-      "title": "Example configuration",
+      "title": "MapTool Language configuration",
       "properties": {
-        "languageServerExample.maxNumberOfProblems": {
+        "mapToolScriptServer.maxNumberOfProblems": {
           "scope": "resource",
           "type": "number",
           "default": 100,
           "description": "Controls the maximum number of problems produced by the server."
         },
-        "languageServerExample.trace.server": {
+        "mapToolScriptServer.trace.server": {
           "scope": "window",
           "type": "string",
           "enum": [
@@ -86,12 +86,16 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run parseyaml && npm run compile",
+    "vscode:prepublish": "npm run package",
     "parseyaml": "python build-grammar.py syntaxes/mts.tmLanguage.yaml syntaxes/mts.tmLanguage.json",
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",
+    "package": "npm run parseyaml && webpack --mode production --devtool hidden-source-map",
+    "antlr": "npm run antlr --prefix ./server",
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd .. && npm run antlr",
     "test": "sh ./scripts/e2e.sh"
   },
   "devDependencies": {
@@ -101,6 +105,9 @@
     "@typescript-eslint/parser": "^7.1.0",
     "eslint": "^8.57.0",
     "mocha": "^10.3.0",
-    "typescript": "^5.3.3"
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
   }
 }

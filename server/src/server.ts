@@ -42,6 +42,7 @@ let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
+    console.log('server activate');
     const capabilities = params.capabilities;
 
     // Does the client support the `workspace/configuration` request?
@@ -117,7 +118,7 @@ connection.onDidChangeConfiguration(change => {
         documentSettings.clear();
     } else {
         globalSettings = <ExampleSettings>(
-            (change.settings.languageServerExample || defaultSettings)
+            (change.settings.mapToolScriptServer || defaultSettings)
         );
     }
     // Refresh the diagnostics since the `maxNumberOfProblems` could have changed.
@@ -134,7 +135,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
     if (!result) {
         result = connection.workspace.getConfiguration({
             scopeUri: resource,
-            section: 'languageServerExample'
+            section: 'mapToolScriptServer'
         });
         documentSettings.set(resource, result);
     }
@@ -166,9 +167,9 @@ connection.languages.diagnostics.on(async (params) => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(async change => {
-    const textDocument = change.document;
-    validateTextDocument(textDocument)
-        .then(diagnostics =>  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics }));
+//     const textDocument = change.document;
+//     validateTextDocument(textDocument)
+//         .then(diagnostics =>  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics }));
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
@@ -176,7 +177,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
     const settings = await getDocumentSettings(textDocument.uri);
 
     let problems = 0;
-    const diagnostics: Diagnostic[] = [];
+    
 
     const chars = new CharStream(textDocument.getText());
     const lexer = new MTScript2Lexer(chars);
@@ -186,6 +187,11 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
     const visitor = new MTScriptVisitor();
     visitor.visit(tree);
 
+    // visitor caught problems
+    problems += visitor.diagnostics.length;
+    const diagnostics: Diagnostic[] = visitor.diagnostics;
+
+    // variable usage problems
     for (let name of visitor.vars.keys()) {
         if (problems > settings.maxNumberOfProblems) {
             break;
@@ -193,7 +199,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
         let usage = visitor.vars.get(name);
         if (isNil(usage)) { continue; }
 
-        const set = defaultTo(min(usage.sets), -1);
+        const set = defaultTo(min(usage.sets), Number.MAX_SAFE_INTEGER);
         for (let get of usage.gets) {
             if (problems > settings.maxNumberOfProblems) {
                 break;
@@ -213,7 +219,6 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
             }
         }
     }
-
     return diagnostics;
 }
 

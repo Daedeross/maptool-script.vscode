@@ -16,18 +16,19 @@ import {
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
+    console.log('activate');
     // The server is implemented in node
-    const serverModule = context.asAbsolutePath(
+    const serverModule = context.asAbsolutePath(//'./dist/server.js');
         path.join('server', 'out', 'server.js')
     );
 
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
     const serverOptions: ServerOptions = {
-        run: { module: serverModule, transport: TransportKind.ipc },
+        run: { module: serverModule, transport: TransportKind.socket },
         debug: {
             module: serverModule,
-            transport: TransportKind.ipc,
+            transport: TransportKind.socket,
         }
     };
 
@@ -35,7 +36,7 @@ export function activate(context: ExtensionContext) {
     const clientOptions: LanguageClientOptions = {
         // Register the server for plain text documents
         documentSelector: [
-            { scheme: 'file', language: 'plaintext' },
+            // { scheme: 'file', language: 'plaintext' },
             { scheme: 'file', language: 'mts' }],
         synchronize: {
             // Notify the server about file changes to '.clientrc files contained in the workspace
@@ -45,8 +46,8 @@ export function activate(context: ExtensionContext) {
 
     // Create the language client and start the client.
     client = new LanguageClient(
-        'languageServerExample',
-        'Language Server Example',
+        'mapToolScriptServer',
+        'MapTool Script Language Server',
         serverOptions,
         clientOptions
     );

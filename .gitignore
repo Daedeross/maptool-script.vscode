@@ -4,3 +4,4 @@ node_modules
 server/src/grammars
 **/out
 .vscode-test
+dist

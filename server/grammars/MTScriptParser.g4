@@ -21,6 +21,7 @@ script
     | ifThen            #ifThenScript
     | ifThenCode        #ifThenCodeScript
     | simpleScript      #simple
+    | WS*               #blankScript
     ;
 
 simpleScript
@@ -73,6 +74,7 @@ rollOptions
 option
     : simple_option
     | function_option LPAREN argList RPAREN
+    | for_option
     ;
 
 simple_option
@@ -91,8 +93,6 @@ simple_option
 function_option
     : KEYWORD_COUNT
     | KEYWORD_DIALOG
-    | KEYWORD_FOR
-    | KEYWORD_FOREACH
     | KEYWORD_FRAME
     | KEYWORD_IF
     | KEYWORD_MACRO
@@ -101,6 +101,11 @@ function_option
     | KEYWORD_TOKEN
     | KEYWORD_WHILE
     | KEYWORD_WHISPER
+    ;
+
+for_option
+    : for=(KEYWORD_FOR | KEYWORD_FOREACH) LPAREN variable (COMMA expression)* RPAREN
+    | for=(KEYWORD_FOR | KEYWORD_FOREACH) LPAREN invalid=expression (COMMA expression)* RPAREN
     ;
 
 scriptBody
