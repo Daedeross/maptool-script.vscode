@@ -3,7 +3,7 @@
   "displayName": "MapTool-Script Support",
   "description": "Syntax highlighting support for the old MapTool scripting language",
   "icon": "images/logo.png",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "bryan-c-jones",
   "repository": {
     "type": "git",
@@ -87,7 +87,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run parseyaml && npm run compile",
-    "parseyaml": "py build-grammar.py syntaxes\\mts.tmLanguage.yaml syntaxes\\mts.tmLanguage.json",
+    "parseyaml": "python build-grammar.py syntaxes/mts.tmLanguage.yaml syntaxes/mts.tmLanguage.json",
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",

@@ -1,0 +1,30 @@
+name: Deploy and Extension and Create Release
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build-package:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+      - name: Setup Node
+        uses: actions/setup-node@v4.0.2
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install PyYAML
+      - name: Publish to Visual Studio Marketplace
+        id: publishToVSCMarketplace
+        uses: HaaLeo/publish-vscode-extension@v1.6.2
+        with:
+          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
+      - name: Create Release
+        run: gh release create ${{ github.ref_name }} --generate-notes ${{ steps.publishToVSCMarketplace.outputs.vsixPath }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
