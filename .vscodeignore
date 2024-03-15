@@ -2,9 +2,8 @@
 **
 
 # Keep
-!**/package.json
 !LICENSE
 !images/
 !syntaxes/
 !language-configuration.json
-!dist/**/*.js*
+!dist/**/*.js
