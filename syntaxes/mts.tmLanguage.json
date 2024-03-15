@@ -437,27 +437,94 @@
             "match": "\\\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\\{[0-9A-Fa-f]+\\}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)"
         },
         "binary-expression": {
-            "name": "meta.expression.binary.mts",
-            "match": "(.+?)(\\+|-|\\*|/|<|>|<=|>=|!=)(.+)",
-            "captures": {
-                "1": {
+            "patterns": [
+                {
+                    "name": "keyword.operator.assignment.compound.mts",
+                    "match": "\\*=|(?<!\\()/=|%=|\\+=|\\-="
+                },
+                {
+                    "name": "keyword.operator.assignment.compound.bitwise.mts",
+                    "match": "\\&=|\\^=|<<=|>>=|>>>=|\\|="
+                },
+                {
+                    "name": "keyword.operator.bitwise.shift.mts",
+                    "match": "<<|>>>|>>"
+                },
+                {
+                    "name": "keyword.operator.comparison.mts",
+                    "match": "===|!==|==|!="
+                },
+                {
+                    "name": "keyword.operator.relational.mts",
+                    "match": "<=|>=|<>|<|>"
+                },
+                {
+                    "match": "(?<=[_$[:alnum:]])(\\!)\\s*(?:(/=)|(?:(/)(?![/*])))",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.operator.logical.mts"
+                        },
+                        "2": {
+                            "name": "keyword.operator.assignment.compound.mts"
+                        },
+                        "3": {
+                            "name": "keyword.operator.arithmetic.mts"
+                        }
+                    }
+                },
+                {
+                    "name": "keyword.operator.logical.mts",
+                    "match": "\\!|&&|\\|\\||\\?\\?"
+                },
+                {
+                    "name": "keyword.operator.bitwise.mts",
+                    "match": "\\&|~|\\^|\\|"
+                },
+                {
+                    "name": "keyword.operator.assignment.mts",
+                    "match": "\\="
+                },
+                {
+                    "name": "keyword.operator.decrement.mts",
+                    "match": "--"
+                },
+                {
+                    "name": "keyword.operator.increment.mts",
+                    "match": "\\+\\+"
+                },
+                {
+                    "name": "keyword.operator.arithmetic.mts",
+                    "match": "%|\\*|/|-|\\+"
+                },
+                {
+                    "begin": "(?<=[_$[:alnum:])\\]])\\s*(?=({{inlineComment}}\\s*)+(?:(/=)|(?:(/)(?![/*]))))",
+                    "end": "(?:(/=)|(?:(/)(?!\\*([^\\*]|(\\*[^\\/]))*\\*\\/)))",
+                    "endCaptures": {
+                        "1": {
+                            "name": "keyword.operator.assignment.compound.mts"
+                        },
+                        "2": {
+                            "name": "keyword.operator.arithmetic.mts"
+                        }
+                    },
                     "patterns": [
                         {
-                            "include": "#expression"
+                            "include": "#comment"
                         }
                     ]
                 },
-                "2": {
-                    "name": "keyword.operator.mts"
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#expression"
+                {
+                    "match": "(?<=[_$[:alnum:])\\]])\\s*(?:(/=)|(?:(/)(?![/*])))",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.operator.assignment.compound.mts"
+                        },
+                        "2": {
+                            "name": "keyword.operator.arithmetic.mts"
                         }
-                    ]
+                    }
                 }
-            }
+            ]
         },
         "rpedit": {
             "name": "meta.macro.rpedit.mts",
