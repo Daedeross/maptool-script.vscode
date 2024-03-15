@@ -42,7 +42,6 @@ let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
-    console.log('server activate');
     const capabilities = params.capabilities;
 
     // Does the client support the `workspace/configuration` request?

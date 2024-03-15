@@ -31,6 +31,21 @@
             }
         },
         {
+            "type": "extensionHost",
+            "request": "launch",
+            "name": "Launch Packed Client",
+            "runtimeExecutable": "${execPath}",
+            "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js",
+            ],
+            "autoAttachChildProcesses": true,
+            "preLaunchTask": {
+                "type": "npm",
+                "script": "webpack"
+            }
+        },
+        {
             "name": "Launch TS File",
             "type": "node",
             "request": "launch",

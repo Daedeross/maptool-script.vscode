@@ -222,7 +222,6 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
         if (isNil(simple)) {
             const function_option = ctx.function_option();
             if (isNil(function_option)) {
-                console.log('for o:' + ctx.start.line);
                 this.visit(ctx.for_option());
             } else {
                 this.visit(ctx.function_option());
