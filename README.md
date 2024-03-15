@@ -26,9 +26,15 @@ This is very basic. So depending on your coding style it may not catch everythin
 
 ## Release Notes
 
-### 0.0.1
+### 0.1.2
 
-Initial release. MVP for Sytax Highlighting.
+* Fixed binary operators breaking quoted strings.
+
+### 0.1.1
+
+* Fixed omission in TextMate grammar causing statements without roll-options to not highlight.
+
+See [Changelog](CHANGELOG.md) for past release notes.
 
 ## Roadmap
 
