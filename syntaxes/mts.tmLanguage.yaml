@@ -1,4 +1,7 @@
-﻿name: MapTool Script
+﻿# YAML file for TextMate grammer 
+# requires conversion into .json to work in VSCode
+# requires a utility to replace variables, such as https://gist.github.com/leonhard-s/7b668697c9f0755de050cf63729713e5
+name: MapTool Script
 scopeName: source.mts
 fileTypes: [mts]
 uuid: 44e8b0bb-5bab-47c6-bc66-e2bd33e1a0b7
@@ -308,17 +311,64 @@ repository:
     name: constant.character.escape.mts
     match: \\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\{[0-9A-Fa-f]+\}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)
 
+  # binary-expression:
+  #   name: meta.expression.binary.mts
+  #   match: (.+?)${{binaryOperator}}(.+)
+  #   captures:
+  #     '1':
+  #       patterns:
+  #       - include: '#expression'
+  #     '2': { name: keyword.operator.mts }
+  #     '3':
+  #       patterns:
+  #       - include: '#expression'
+
+  # the above did not work when operators showed up in strings,
+  # instead taking a snipped from https://github.com/microsoft/TypeScript-TmLanguage/blob/master/TypeScript.YAML-tmLanguage
+  # (Note, as-is except changed .ts to .mts)
+  # <snippet>
   binary-expression:
-    name: meta.expression.binary.mts
-    match: (.+?)${{binaryOperator}}(.+)
-    captures:
-      '1':
-        patterns:
-        - include: '#expression'
-      '2': { name: keyword.operator.mts }
-      '3':
-        patterns:
-        - include: '#expression'
+    patterns:
+    - name: keyword.operator.assignment.compound.mts
+      match: \*=|(?<!\()/=|%=|\+=|\-=
+    - name: keyword.operator.assignment.compound.bitwise.mts
+      match: \&=|\^=|<<=|>>=|>>>=|\|=
+    - name: keyword.operator.bitwise.shift.mts
+      match: <<|>>>|>>
+    - name: keyword.operator.comparison.mts
+      match: ===|!==|==|!=
+    - name: keyword.operator.relational.mts
+      match: <=|>=|<>|<|>
+    - match: (?<=[_$[:alnum:]])(\!)\s*(?:(/=)|(?:(/)(?![/*])))
+      captures:
+        '1': { name: keyword.operator.logical.mts }
+        '2': { name: keyword.operator.assignment.compound.mts }
+        '3': { name: keyword.operator.arithmetic.mts }
+    - name: keyword.operator.logical.mts
+      match: \!|&&|\|\||\?\?
+    - name: keyword.operator.bitwise.mts
+      match: \&|~|\^|\|
+    - name: keyword.operator.assignment.mts
+      match: \=
+    - name: keyword.operator.decrement.mts
+      match: --
+    - name: keyword.operator.increment.mts
+      match: \+\+
+    - name: keyword.operator.arithmetic.mts
+      match: '%|\*|/|-|\+'
+    # capture the arithmetic sign followed by variable or parenthesized expression so that it is not interpreted as regex
+    - begin: (?<=[_$[:alnum:])\]])\s*(?=({{inlineComment}}\s*)+(?:(/=)|(?:(/)(?![/*]))))
+      end: (?:(/=)|(?:(/)(?!\*([^\*]|(\*[^\/]))*\*\/)))
+      endCaptures:
+        '1': { name: keyword.operator.assignment.compound.mts }
+        '2': { name: keyword.operator.arithmetic.mts }
+      patterns:
+      - include: '#comment'
+    - match: (?<=[_$[:alnum:])\]])\s*(?:(/=)|(?:(/)(?![/*])))
+      captures:
+        '1': { name: keyword.operator.assignment.compound.mts }
+        '2': { name: keyword.operator.arithmetic.mts }
+  # </snippet>
 
   rpedit:
     name: meta.macro.rpedit.mts
