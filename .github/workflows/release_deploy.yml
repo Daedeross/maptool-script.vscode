@@ -1,4 +1,4 @@
-name: Deploy and Extension and Create Release
+name: Deploy Extension and Create Release
 on:
   push:
     tags:
