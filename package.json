@@ -36,13 +36,6 @@
         "configuration": "./language-configuration.json"
       }
     ],
-    "grammars": [
-      {
-        "language": "mts",
-        "scopeName": "source.mts",
-        "path": "./syntaxes/mts.tmLanguage.json"
-      }
-    ],
     "configurationDefaults": {
       "[mts]": {
         "editor.semanticHighlighting.enabled": true
@@ -61,10 +54,25 @@
         ]
       }
     },
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "colon": [
+            "keyword.other.mts"
+          ]
+        }
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "MapTool Language configuration",
       "properties": {
+        "mapToolScript.highlighting.legacy": {
+          "description": "Enable Legacy (TextMate) syntax highlighting.",
+          "scope": "window",
+          "type": "boolean",
+          "default": false
+        },
         "mapToolScriptServer.maxNumberOfProblems": {
           "scope": "resource",
           "type": "number",
@@ -79,7 +87,7 @@
             "messages",
             "verbose"
           ],
-          "default": "off",
+          "default": "verbose",
           "description": "Traces the communication between VS Code and the language server."
         }
       }

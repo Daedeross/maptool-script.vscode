@@ -108,8 +108,17 @@ variables:
 
 patterns:
   - include: '#rpedit'
-  - include: "#macro"
+  - include: '#macro'
+  - include: '#html'
 repository:
+  html:
+    name: meta.embedded.html.mts
+    match: '([^\[]*)'
+    captures:
+      '1':
+        patterns:
+        - include: text.html
+        - include: source.js
   macro:
     patterns:
     - include: '#one-line-macro'
@@ -362,8 +371,8 @@ repository:
       endCaptures:
         '1': { name: keyword.operator.assignment.compound.mts }
         '2': { name: keyword.operator.arithmetic.mts }
-      patterns:
-      - include: '#comment'
+      # patterns:
+      # - include: '#comment'
     - match: (?<=[_$[:alnum:])\]])\s*(?:(/=)|(?:(/)(?![/*])))
       captures:
         '1': { name: keyword.operator.assignment.compound.mts }

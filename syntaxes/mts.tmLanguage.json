@@ -11,9 +11,28 @@
         },
         {
             "include": "#macro"
+        },
+        {
+            "include": "#html"
         }
     ],
     "repository": {
+        "html": {
+            "name": "meta.embedded.html.mts",
+            "match": "([^\\[]*)",
+            "captures": {
+                "1": {
+                    "patterns": [
+                        {
+                            "include": "text.html"
+                        },
+                        {
+                            "include": "source.js"
+                        }
+                    ]
+                }
+            }
+        },
         "macro": {
             "patterns": [
                 {
@@ -506,12 +525,7 @@
                         "2": {
                             "name": "keyword.operator.arithmetic.mts"
                         }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#comment"
-                        }
-                    ]
+                    }
                 },
                 {
                     "match": "(?<=[_$[:alnum:])\\]])\\s*(?:(/=)|(?:(/)(?![/*])))",

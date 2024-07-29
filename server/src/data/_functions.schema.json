@@ -1,0 +1,71 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "$id": "https://github.com/Daedeross/maptool-script.vscode/functions",
+    "title": "Functions",
+    "description": "Definition of built-in functions.",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "The primary name of the function. Should match the wiki title."
+            },
+            "aliases": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "description": {
+                "type": "string"
+            },
+            "isTrusted": {
+                "type": "boolean"
+            },
+            "usages": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "parameters" : {
+                            "type": [ "object" ],
+                            "additionalProperties": {
+                                "type": [ "object", "boolean" ],
+                                "properties": {
+                                    "type": {
+                                        "type": [ "string", "array" ],
+                                        "enum": [ "number", "string", "string List", "string Property List", "JSON Array", "JSON Object" ],
+                                        "items": {
+                                            "enum": [ "number", "string", "string List", "string Property List", "JSON Array", "JSON Object" ]
+                                        }
+                                    },
+                                    "description": {
+                                        "type" : "string"
+                                    },
+                                    "isParamArray" : {
+                                        "type": "boolean"
+                                    }
+                                }
+                            },
+                            "minProperties": 1
+                        },
+                        "isTrusted" : {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "returns": {
+                "type": "string"
+            },
+            "notes": {
+                "type": "string"
+            },
+            "wiki": {
+                "type": "string"
+            }
+        },
+        "required": [ "name", "usages" ]
+    }
+}

@@ -34,6 +34,7 @@ import {
     ScriptContext,
     ScriptsContext,
     SimpleContext,
+    SimpleScriptContext,
     Simple_optionContext,
     StatementContext,
     SwitchBodyContext,
@@ -47,10 +48,12 @@ import {
     VariableContext
 } from "./grammars/MTScriptParser";
 import MTScriptParserVisitor from "./grammars/MTScriptParserVisitor";
+import { SymbolRef, SymbolType } from "./function_data";
 
 export enum TokenType {
     string = 0,
     keyword,
+    colon,
     number,
     regexp,
     operator,
@@ -64,6 +67,7 @@ export const MTScriptLegend: SemanticTokensLegend = {
     tokenTypes: [
         nameOf(TokenType.string),
         nameOf(TokenType.keyword),
+        nameOf(TokenType.colon),
         nameOf(TokenType.number),
         nameOf(TokenType.regexp),
         nameOf(TokenType.operator),
@@ -76,9 +80,8 @@ export const MTScriptLegend: SemanticTokensLegend = {
 const pushToken = (builder: SemanticTokensBuilder, token: Token | undefined, type: TokenType) => {
     if (isNil(token)) { return builder; }
     const text = token.text;
-    const ch = text.charCodeAt(0);
     const length = text.length;
-    builder.push(token.line, ch, length, type, 0);
+    builder.push(token.line - 1, token.column, length, type, 0);
 
     return builder;
 }
@@ -115,13 +118,21 @@ const AddGet = (map: Map<string, VariableUsage>, name: string, position: number,
     map.set(name, usage);
 }
 
-export class MTScriptVisitor extends MTScriptParserVisitor<void>
-{
+export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     private builder = new SemanticTokensBuilder();
+    private symbols: Array<SymbolRef> = [];
     public vars = new Map<string, VariableUsage>();
     public diagnostics: Array<Diagnostic> = [];
 
+    constructor() {
+        super();
+        // macro.args is always set, either by the calling macro or defaults to string.empty
+        AddSet(this.vars, "macro.args", -1);
+    }
+
     getTokens = () => this.builder.build();
+
+    getSymbols = () => this.symbols;
 
     visitMacro = (ctx: MacroContext) => {
         ctx.bit_list().forEach(element => {
@@ -140,41 +151,61 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
     //     console.log('ms' + ctx.start.line );
     // }
 
-    visitSwitchCodeScript = (ctx: SwitchCodeScriptContext) => { ctx.switchCode().accept(this); }
-    visitSwitchScript = (ctx: SwitchScriptContext) => { ctx.switch_().accept(this); }
+    visitSwitchCodeScript = (ctx: SwitchCodeScriptContext) => {
+        ctx.switchCode().accept(this);
+    }
+    visitSwitchScript = (ctx: SwitchScriptContext) => {
+        ctx.switch_().accept(this);
+    }
     visitIfThenScript = (ctx: IfThenScriptContext) => { ctx.ifThen().accept(this); }
     visitIfThenCodeScript = (ctx: IfThenCodeScriptContext) => { ctx.ifThenCode().accept(this); }
     visitSimple = (ctx: SimpleContext) => { ctx.simpleScript().accept(this); }
 
+    visitSimpleScript = (ctx: SimpleScriptContext) => {
+        ctx.rollOptions()?.accept(this);
+        pushToken(this.builder, ctx.COLON()?.symbol, TokenType.colon);
+        ctx.scriptBody()?.accept(this);
+    }
+
     visitSwitch = (ctx: SwitchContext) => {
+        // visit any options before the 'switch'
+        ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_SWITCH().symbol, TokenType.keyword);
-        this.visit(ctx._first);
         this.visit(ctx.expression());
-        this.visit(ctx._second);
+        // visit options afer the switch
+        ctx._second?.accept(this);
+
+        pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         this.visit(ctx.switchBody());
     }
 
     visitSwitchCode = (ctx: SwitchCodeContext) => {
+        ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_SWITCH().symbol, TokenType.keyword);
-        pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
-        this.visit(ctx._first);
         this.visit(ctx.expression());
-        this.visit(ctx._second);
+
+        pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
+        pushToken(this.builder, ctx.COLON().symbol, TokenType.operator);
+
         this.visit(ctx.switchCodeBody());
     }
 
     visitIfThen = (ctx: IfThenContext) => {
         pushToken(this.builder, ctx.KEYWORD_IF().symbol, TokenType.keyword);
         this.visit(ctx.expression());
+        pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         ctx._true_.accept(this);
+        pushToken(this.builder, ctx.SEMI().symbol, TokenType.colon);
         ctx._false_.accept(this);
     }
 
     visitIfThenCode = (ctx: IfThenCodeContext) => {
         pushToken(this.builder, ctx.KEYWORD_IF().symbol, TokenType.keyword);
-        pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
         this.visit(ctx.expression());
+        pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
+        pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
         ctx._true_.accept(this);
+        pushToken(this.builder, ctx.SEMI().symbol, TokenType.colon);
         ctx._false_.accept(this);
     }
 
@@ -183,15 +214,18 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
             this.visit(item);
         });
         pushToken(this.builder, ctx.KEYWORD_DEFAULT()?.symbol, TokenType.keyword);
-        const dflt = ctx.statement()
-        if (!isNil(dflt)) {
-            this.visit(dflt);
+        const _default_ = ctx.statement()
+        if (!isNil(_default_)) {
+            this.visit(_default_);
         }
     }
+
     visitSwitchCase = (ctx: SwitchCaseContext) => {
         pushToken(this.builder, ctx.KEYWORD_CASE()?.symbol, TokenType.keyword);
         this.visit(ctx.atom());
+        pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         this.visit(ctx.statement());
+        pushToken(this.builder, ctx.SEMI().symbol, TokenType.colon);
     }
 
     visitSwitchCodeBody = (ctx: SwitchCodeBodyContext) => {
@@ -208,7 +242,9 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
     visitSwitchCodeCase = (ctx: SwitchCodeCaseContext) => {
         pushToken(this.builder, ctx.KEYWORD_CASE()?.symbol, TokenType.keyword);
         this.visit(ctx.atom());
+        pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         this.visit(ctx.block());
+        pushToken(this.builder, ctx.SEMI().symbol, TokenType.colon);
     }
 
     visitRollOptions = (ctx: RollOptionsContext) => {
@@ -234,16 +270,18 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
 
     visitSimple_option = (ctx: Simple_optionContext) => {
         const text = ctx.getText();
-        const ch = text.charCodeAt(0);
+        const line = ctx.start.line - 1;
+        const col = ctx.start.column;
         const length = text.length;
-        this.builder.push(ctx.start.line, ch, length, TokenType.keyword, 0);
+        this.builder.push(line, col, length, TokenType.keyword, 0);
     }
 
     visitFunction_option = (ctx: Function_optionContext) => {
         const text = ctx.getText();
-        const ch = text.charCodeAt(0);
+        const line = ctx.start.line - 1;
+        const col = ctx.start.column;
         const length = text.length;
-        this.builder.push(ctx.start.line, ch, length, TokenType.keyword, 0);
+        this.builder.push(line, col, length, TokenType.keyword, 0);
     }
 
     visitFor_option = (ctx: For_optionContext) => {
@@ -264,7 +302,9 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
         const variable = ctx.variable();
         if (!isNil(variable)) {
             this.visit(variable);
-            AddSet(this.vars, variable.getText(), variable.start.start);
+            var text = variable.getText();
+            AddSet(this.vars, text, variable.start.start);
+            this.symbols.push
             argCount++;
         }
 
@@ -386,8 +426,8 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
     visitAtom = (ctx: AtomContext) => {
         //console.log('atom');
         const text = ctx.getText();
-        const ch = text.charCodeAt(0);
-        const line = ctx.start.line;
+        const line = ctx.start.line - 1;
+        const col = ctx.start.column;
 
         const variable = ctx.variable();
         if (isNil(variable)) {
@@ -395,23 +435,38 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
             if (isNil(numeric)) {
                 const bool = ctx.boolean_literal();
                 if (isNil(bool)) {
-                    this.builder.push(line, ch, text.length, TokenType.string, 0);
+                    this.builder.push(line, col, text.length, TokenType.string, 0);
                 } else {
-                    this.builder.push(line, ch, text.length, TokenType.keyword, 0);
+                    this.builder.push(line, col, text.length, TokenType.keyword, 0);
                 }
             } else {
-                this.builder.push(line, ch, text.length, TokenType.number, 0);
+                this.builder.push(line, col, text.length, TokenType.number, 0);
             }
         } else {
-            this.builder.push(line, ch, text.length, TokenType.variable, 0);
+            this.builder.push(line, col, text.length, TokenType.variable, 0);
             AddGet(this.vars, variable.getText(), variable.start.start, variable.getText().length);
         }
     }
 
     visitFunction = (ctx: FunctionContext) => {
-        this.visit(ctx.variable());
+        const variable = ctx.variable();
+        const text = variable.getText();
+        const line = ctx.start.line - 1;
+        const col = ctx.start.column;
+
+        this.builder.push(line, col, text.length, TokenType.function, 0);
+        this.symbols.push({
+            name: text,
+            type: SymbolType.function,
+            range: {
+                start: { line: line, character: col },
+                end: { line: line, character: col + text.length }   // line# is unchanged since identifiers cannot be broken by whitespace
+            }
+        })
+
         this.visit(ctx.argList());
     }
+
     visitArgList = (ctx: ArgListContext) => {
         ctx.expression_list()
             .forEach(exp => this.visit(exp));
@@ -419,9 +474,9 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void>
 
     visitVariable = (ctx: VariableContext) => {
         const text = ctx.getText();
-        const ch = text.charCodeAt(0);
-        const line = ctx.start.line;
+        const line = ctx.start.line - 1;
+        const col = ctx.start.column;
 
-        this.builder.push(line, ch, text.length, TokenType.variable, 0);
+        this.builder.push(line, col, text.length, TokenType.variable, 0);
     }
 };

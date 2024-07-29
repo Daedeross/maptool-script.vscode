@@ -7,12 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+-
+
+## [1.0.0]
+
+### Added
+
 - ANTL4 Grammar file for MTScript
 - Language server w/client
   - Sematic tokens
   - Tree visitor
   - Variable usage before assignment waring.
   - For-loop argument validation.
+
+### Deprecated
+
+- TextMate(regex)-based syntax higlighting.
+
+### Fixed
+
+- Splitting code across muliple lines breaks highlighting
+- Colon used for identifying library in MACRO roll option breaks highlighting
+
+### Removed
+
+- Temporarily removed
 
 ## [0.1.2]
 

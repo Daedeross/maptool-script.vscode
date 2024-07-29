@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, ConfigurationChangeEvent, window, extensions } from 'vscode';
 
 import {
     LanguageClient,
@@ -13,7 +13,17 @@ import {
     TransportKind
 } from 'vscode-languageclient/node';
 
+const EXTENSION_ID = 'bryan-c-jones.maptool-script';
+
 let client: LanguageClient;
+
+// const onConfigurationChanged = (e: ConfigurationChangeEvent) => {
+//     extensions.getExtension(EXTENSION_ID)?.packageJSON.co
+// }
+
+// function wire_events() {
+//     workspace.onDidChangeConfiguration(onConfigurationChanged)
+// }
 
 export function activate(context: ExtensionContext) {
     // The server is implemented in node

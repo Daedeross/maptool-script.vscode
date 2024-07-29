@@ -1,4 +1,13 @@
 {
     "FSharp.suggestGitignore": false,
-    "java.project.sourcePaths": []
+    "java.project.sourcePaths": [],
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "**/*.mts.json"
+            ],
+            "schema": true,
+            "url": "server/src/data/_functions.schema.json"
+        }
+    ]
 }

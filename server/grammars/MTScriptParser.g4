@@ -48,7 +48,7 @@ switch
 switchCode
     : (first=rollOptions COMMA)? KEYWORD_SWITCH
       LPAREN expression RPAREN COMMA KEYWORD_CODE COLON
-      second=switchCodeBody
+      switchCodeBody
     ;
 
 switchBody

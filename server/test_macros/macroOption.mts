@@ -1,0 +1,1 @@
+[h, macro("foo@lib:bar"): ""]

@@ -1,0 +1,1311 @@
+[
+    {
+        "name": "abort",
+        "aliases": [],
+        "description": "Is used to conditionally abort the execution of a macro.",
+        "usages": [
+            {
+                "parameters": {
+                    "abrt": {
+                        "type": "number",
+                        "description": "`0` if the abort function should abort the macro, nonzero if it should not."
+                    }
+                }
+            }
+        ],
+        "notes": "Note that only the output of the macro is discarded when the macro is aborted any changes made to macros will not be undone.",
+        "wiki": "/abort"
+    },
+    {
+        "name": "absolutevalue",
+        "aliases": [
+            "abs"
+        ],
+        "description": "Returns the absolute value of a number.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The number to take the absolute value of."
+                    }
+                }
+            }
+        ],
+        "notes": "The absolute value of a number is the number without the sign.",
+        "wiki": "/absolutevalue"
+    },
+    {
+        "name": "add",
+        "aliases": [
+            "sum",
+            "concat"
+        ],
+        "description": "Retruns the sum of two or more numbers, or concatenates multiple strings together.",
+        "usages": [
+            {
+                "parameters": {
+                    "values": {
+                        "type": [
+                            "string",
+                            "number"
+                        ],
+                        "isParamArray": true,
+                        "description": "The numbers/strings to add/concatenate together."
+                    }
+                }
+            }
+        ],
+        "notes": "If at least one argument is a string, then all non-string arguments will also be treated as strings. That is, they will be passed to the `string()` function first, then concatenated normally.",
+        "wiki": "/add"
+    },
+    {
+        "name": "addAllNPCsToInitiative",
+        "aliases": [],
+        "description": "Adds all **NPC** tokens on the Token layer of the current map to the initiative panel.",
+        "isTrusted": true,
+        "usages": [
+            {
+                "parameters": {}
+            }
+        ],
+        "returns": "the number of tokens that were *added* to the initiative panel. Tokens already on the initiative panel are not counted.",
+        "notes": "This function will not assign any initiative value to the tokens. You can use `setInitiative()` to set the initiative value of a token.",
+        "wiki": "/addAllNPCsToInitiative"
+    },
+    {
+        "name": "addAllPCsToInitiative",
+        "aliases": [],
+        "description": "Adds all **PC** tokens on the Token layer of the current map to the initiative panel.",
+        "isTrusted": true,
+        "usages": [
+            {
+                "parameters": {}
+            }
+        ],
+        "returns": "the number of tokens that were *added* to the initiative panel. Tokens already on the initiative panel are not counted.",
+        "notes": "This function will not assign any initiative value to the tokens. You can use `setInitiative()` to set the initiative value of a token.",
+        "wiki": "/addAllPCsToInitiative"
+    },
+    {
+        "name": "addAllToInitiative",
+        "aliases": [],
+        "description": "Adds *all* tokens on the Token layer of the current map to the initiative panel.",
+        "usages": [
+            {
+                "parameters": {}
+            }
+        ],
+        "returns": "the number of tokens that were *added* to the initiative panel. Tokens already on the initiative panel are not counted.",
+        "notes": "This function will not assign any initiative value to the tokens. You can use `setInitiative()` to set the initiative value of a token.",
+        "wiki": "/addAllToInitiative"
+    },
+    {
+        "name": "addTableEntry",
+        "aliases": [],
+        "description": "Adds a new row to the specified table.",
+        "isTrusted": true,
+        "usages": [
+            {
+                "parameters": {
+                    "tableName": {
+                        "type": "string",
+                        "description": "A string containing the name of the Table."
+                    },
+                    "rangeStart": {
+                        "type": "number",
+                        "description": "An integer indicating the lowest value that will return this row."
+                    },
+                    "rangeEnd": {
+                        "type": "number",
+                        "description": "An integer indicating the highest value that will return this row."
+                    },
+                    "result": {
+                        "type": "string",
+                        "description": "A string containing the result returned by the table() function."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "tableName": {
+                        "type": "string",
+                        "description": "A string containing the name of the Table."
+                    },
+                    "rangeStart": {
+                        "type": "number",
+                        "description": "An integer indicating the lowest value that will return this row."
+                    },
+                    "rangeEnd": {
+                        "type": "number",
+                        "description": "An integer indicating the highest value that will return this row."
+                    },
+                    "result": {
+                        "type": "string",
+                        "description": "A string containing the result returned by the table() function."
+                    },
+                    "imageId": {
+                        "type": "string",
+                        "description": "Optional and is the asset id of an image that will be returned by the `tableImage()` function."
+                    }
+                }
+            }
+        ],
+        "notes": "Adding a row to a table will not automatically change the table row value, so this should be updated to avoid possible errors (See setTableRoll() function).",
+        "wiki": "/addTableEntry"
+    },
+    {
+        "name": "addToInitiative",
+        "aliases": [],
+        "description": "Adds the Current Token to the initiative panel. Additional parameters allow you to specify the token and an initiative value.",
+        "usages": [
+            {
+                "parameters": {}
+            },
+            {
+                "parameters": {
+                    "AllowDuplicates": {
+                        "type": "number",
+                        "description": "If false (default) then will not add the token if it is already in the initiative list. If true (1) an additional entry will be added to the initiative list (so there could be multiple initiative entries for the same token)."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "AllowDuplicates": {
+                        "type": "number",
+                        "description": "If false (default) then will not add the token if it is already in the initiative list. If true (1) an additional entry will be added to the initiative list (so there could be multiple initiative entries for the same token)."
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "The initiative value to set. If included, the initiative will be set even if the token is already on the initiative list and duplicates are not allowed."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "AllowDuplicates": {
+                        "type": "number",
+                        "description": "If false (default) then will not add the token if it is already in the initiative list. If true (1) an additional entry will be added to the initiative list (so there could be multiple initiative entries for the same token)."
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "The initiative value to set. If included, the initiative will be set even if the token is already on the initiative list and duplicates are not allowed."
+                    },
+                    "tokenRef": {
+                        "type": "number",
+                        "description": " Either the token id or Token Name of the token to add to the initiative. Defaults to the Current Token. "
+                    }
+                },
+                "isTrusted": true
+            },
+            {
+                "parameters": {
+                    "AllowDuplicates": {
+                        "type": "number",
+                        "description": "If false (default) then will not add the token if it is already in the initiative list. If true (1) an additional entry will be added to the initiative list (so there could be multiple initiative entries for the same token)."
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "The initiative value to set. If included, the initiative will be set even if the token is already on the initiative list and duplicates are not allowed."
+                    },
+                    "tokenRef": {
+                        "type": "number",
+                        "description": " Either the token id or Token Name of the token to add to the initiative. Defaults to the Current Token. "
+                    },
+                    "mapname": {
+                        "type": "number",
+                        "description": "If false (default) then will not add the token if it is already in the initiative list. If true (1) an additional entry will be added to the initiative list (so there could be multiple initiative entries for the same token)."
+                    }
+                },
+                "isTrusted": true
+            }
+        ],
+        "returns": "Returns 1 if added to the initiative, 0 if did not.",
+        "notes": "Token IDs are unique, but Token Names can be duplicated. Using Token Name when more than one token has the same name can produce unexpected results.",
+        "wiki": "/addToInitiative"
+    },
+    {
+        "name": "and",
+        "aliases": [],
+        "description": "Performs a logical AND comparison between all of the passed numeric values.",
+        "usages": [
+            {
+                "parameters": {
+                    "numbers": {
+                        "type": "number",
+                        "description": "The values to apply logical and to.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "`1` (true) If *all* input values are truthy (non-zero), otherwise returns `0` (false).",
+        "notes": "A value of `0` is `false` and all non-zero values are treated as `true`",
+        "wiki": "/and"
+    },
+    {
+        "name": "arg",
+        "aliases": [],
+        "description": "Is used to extract arguments that are passed to a macro when called as a user defined function.",
+        "usages": [
+            {
+                "parameters": {
+                    "index": {
+                        "type": "number",
+                        "description": "The index of the argument to return. Indexes begin at 0."
+                    }
+                }
+            }
+        ],
+        "returns": "The value of the specified argument passed into the user-defined function.",
+        "notes": "The `argCount()` function is often used in conjunction with arg() to determine the number of arguments that have been passed to the user defined function.",
+        "wiki": "/arg"
+    },
+    {
+        "name": "argCount",
+        "aliases": [],
+        "description": "Is used to determine the number of arguments that have been passed to a user defined function. ",
+        "usages": [
+            {
+                "parameters": {}
+            }
+        ],
+        "returns": "The number of arguments passed to the user-defined function this (`argCount`) is called from.",
+        "notes": "Once the number of arguments have been determined you can use `arg()` to retrieve them.",
+        "wiki": "/argCount"
+    },
+    {
+        "name": "arsMagicaStress",
+        "aliases": [],
+        "description": "For Ars Magica.",
+        "usages": [
+            {
+                "parameters": {
+                    "dice": {
+                        "type": "number",
+                        "description": "??"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "dice": {
+                        "type": "number",
+                        "description": "??"
+                    },
+                    "bonus": {
+                        "type": "number",
+                        "description": "??"
+                    }
+                }
+            }
+        ],
+        "wiki": "/arsMagicaStress"
+    },
+    {
+        "name": "arsMagicaStressNum",
+        "aliases": [],
+        "description": "For Ars Magica.",
+        "usages": [
+            {
+                "parameters": {
+                    "dice": {
+                        "type": "number",
+                        "description": "??"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "dice": {
+                        "type": "number",
+                        "description": "??"
+                    },
+                    "bonus": {
+                        "type": "number",
+                        "description": "??"
+                    }
+                }
+            }
+        ],
+        "wiki": "/arsMagicaStressNum"
+    },
+    {
+        "name": "assert",
+        "aliases": [],
+        "description": "Halts execution and prints a custom error message if a condition is `false` (`0`)",
+        "usages": [
+            {
+                "parameters": {
+                    "condition": {
+                        "type": "number",
+                        "description": "The test condition that must evaluate to `true` (`1`) for the macro to continue."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The custom error message that is presented if the macro is halted due to the `false` (`0`) condition."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "condition": {
+                        "type": "number",
+                        "description": "The test condition that must evaluate to `true` (`1`) for the macro to continue."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The custom error message that is presented if the macro is halted due to the `false` (`0`) condition."
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "description": "Determines if the error message should have the message prefix 'Macro defined error: '. Defaults to true(1), set to false(0) if you do not wish your custom error message to have the message prefix."
+                    }
+                }
+            }
+        ],
+        "notes": "When aborting a macro called from another macro (for example, a library token), all macros are aborted, not just the one executing.\nSince 1.5.0 you can change that behaviour by using macro.catchAssert.",
+        "wiki": "/assert"
+    },
+    {
+        "name": "average",
+        "aliases": [
+            "avg"
+        ],
+        "description": "Calculates the average (arithmetic mean) of all of the numbers that are passed in.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "isParamArray": true,
+                        "description": "The numbers to average."
+                    }
+                }
+            }
+        ],
+        "returns": "The arithmetic mean of the arguments.",
+        "notes": "The arithmetic mean is equal to the sum of all the arguments divided by the number of arguments.",
+        "wiki": "/average"
+    },
+    {
+        "name": "base64.decode",
+        "aliases": [],
+        "description": "Accepts a Base64 encoded string and decodes it to plain text.",
+        "usages": [
+            {
+                "parameters": {
+                    "string": {
+                        "type": "string",
+                        "description": "The base64 encoded string to be decoded."
+                    }
+                }
+            }
+        ],
+        "returns": "The decoded string.",
+        "wiki": "/base64.decode"
+    },
+    {
+        "name": "base64.encode",
+        "aliases": [],
+        "description": "Takes the supplied text string and encodes it to Base64.",
+        "usages": [
+            {
+                "parameters": {
+                    "string": {
+                        "type": "string",
+                        "description": "The text string to be encoded."
+                    }
+                }
+            }
+        ],
+        "returns": "The encoded string.",
+        "wiki": "/base64.encode"
+    },
+    {
+        "name": "bitwiseand",
+        "aliases": [
+            "band"
+        ],
+        "description": "Performs the bitwise 'and' operation of the arguments.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The numbers to perform the operation with.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "number",
+        "notes": "",
+        "wiki": "/bitwiseand"
+    },
+    {
+        "name": "bitwisenot",
+        "aliases": [
+            "bnot"
+        ],
+        "description": "Performs the bitwise 'not' operation of the arguments.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The numbers to perform the operation with.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "number",
+        "notes": "",
+        "wiki": "/bitwisenot"
+    },
+    {
+        "name": "bitwiseor",
+        "aliases": [
+            "bor"
+        ],
+        "description": "Performs the bitwise 'or' operation of the arguments.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The numbers to perform the operation with.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "number",
+        "notes": "",
+        "wiki": "/bitwiseor"
+    },
+    {
+        "name": "bitwisexor",
+        "aliases": [
+            "bexor"
+        ],
+        "description": "Performs the bitwise 'xor' operation of the arguments.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The numbers to perform the operation with.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "number",
+        "notes": "",
+        "wiki": "/bitwisexor"
+    },
+    {
+        "name": "bringDrawingToFront",
+        "aliases": [],
+        "description": "For a specified drawing, moves the drawing to in front of all other drawings on the same layer.",
+        "usages": [
+            {
+                "parameters": {
+                    "mapName": {
+                        "type": "string",
+                        "description": "The name of the map."
+                    },
+                    "drawingId": {
+                        "type": "string",
+                        "description": "The `id` of the drawing"
+                    }
+                }
+            }
+        ],
+        "notes": "he easiest way to discover a drawing's Id is via the Draw Explorer interface.",
+        "wiki": "/bringDrawingToFront"
+    },
+    {
+        "name": "bringToFront",
+        "aliases": [],
+        "description": "Adjust the z order (or draw order) of the Token so that is is drawn after all other Tokens on the same Map Layer.",
+        "usages": [
+            {
+                "isTrusted": false
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": " Either the token `id` or Token Name of the token to effect, defaults to the `Current Token`. "
+                    }
+                },
+                "isTrusted": true
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of the token to effect, defaults to the `Current Token`. "
+                    },
+                    "mapname": {
+                        "type": "string",
+                        "description": "The name of the map to find the token. Defaults to the current map."
+                    }
+                },
+                "isTrusted": true
+            }
+        ],
+        "notes": "Token IDs are unique, but Token Names can be duplicated. Using Token Name when more than one token has the same name can produce unexpected results.",
+        "wiki": "/bringToFront"
+    },
+    {
+        "name": "broadcast",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "message": {
+                        "type": "string",
+                        "description": "a message that is broadcasted to the users that are listed as parameters."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "message": {
+                        "type": "string",
+                        "description": "a message that is broadcasted to the users that are listed as parameters."
+                    },
+                    "targets": {
+                        "type": [
+                            "string List",
+                            "JSON Array"
+                        ],
+                        "description": "a String list or JSON array of Player names, not Token names. Also recognizes: 'gm', 'gm-self', 'self', 'none', 'all', 'not-gm', 'not-self', and 'not-gm-self' as valid parameters. Defaults to 'all'."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "message": {
+                        "type": "string",
+                        "description": "a message that is broadcasted to the users that are listed as parameters."
+                    },
+                    "targets": {
+                        "type": [
+                            "string List",
+                            "JSON Array"
+                        ],
+                        "description": "a String list or JSON array of Player names, not Token names. Also recognizes: 'gm', 'gm-self', 'self', 'none', 'all', 'not-gm', 'not-self', and 'not-gm-self' as valid parameters. Defaults to 'all'."
+                    },
+                    "delimiter": {
+                        "type": "string",
+                        "description": "The delimiter used to separate the values in the String List that is given, defaults to ','. If 'json' is specified, a JSON array is expected instead of a String List."
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "notes": "`targets` is inclusive, so setting it to 'not-gm, gm' will send the message to all connected players - all non-GMs and all GMs.",
+        "wiki": "/broadcast"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "Returns a json array of the points visible on the target token from the source token as an enumerated list. Default source is Current Token.",
+        "usages": [
+            {
+                "parameters": {
+                    "target": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of target token."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "target": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of target token."
+                    },
+                    "source": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of the source, i.e. viewing token"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "target": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of target token."
+                    },
+                    "source": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of the source, i.e. viewing token"
+                    },
+                    "mapname": {
+                        "type": "string",
+                        "description": "The name of the map to find the two tokens. Defaults to the current map."
+                    }
+                }
+            }
+        ],
+        "returns": "JSON Array. The enumerated list will contain zero to five of the following values: `TOP_RIGHT`, `BOTTOM_RIGHT`, `TOP_LEFT`, `BOTTOM_LEFT`, `CENTER`.",
+        "notes": "When a token is not visible, an empty json array is returned: '[]'",
+        "wiki": "/"
+    },
+    {
+        "name": "capitalize",
+        "aliases": [],
+        "description": "Capitalizes the first letter of each word in a string.",
+        "usages": [
+            {
+                "parameters": {
+                    "input": {
+                        "type": "string",
+                        "description": "String to be converted."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "input": {
+                        "type": "string",
+                        "description": "String to be converted."
+                    },
+                    "treatNumbersSymbolsAsBoundaries": {
+                        "type": "string",
+                        "description": "Whether numbers and symbols should be treated as word boundaries - defaults to true(1)."
+                    }
+                }
+            }
+        ],
+        "returns": "The capitalized string.",
+        "notes": "By default, numbers and symbols in the strings are treated as word boundaries.",
+        "wiki": "/capitalize"
+    },
+    {
+        "name": "ceiling",
+        "aliases": [
+            "ceil"
+        ],
+        "description": "Returns the number passed in if it is an integer, otherwise it returns the number rounded up to the next integer.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The number to ceiling."
+                    }
+                }
+            }
+        ],
+        "returns": "The number passed in if it is an integer, otherwise it returns the number rounded up to the next integer.",
+        "notes": "",
+        "wiki": "/ceiling"
+    },
+    {
+        "name": "clearLights",
+        "aliases": [],
+        "description": "Turns off all of the light sources for a Token.",
+        "usages": [
+            {
+                "parameters": {},
+                "isTrusted": false
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token for which to turn off all light sources, defaults to the Current Token. "
+                    }
+                },
+                "isTrusted": true
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token for which to turn off all light sources, defaults to the Current Token. "
+                    },
+                    "mapname": {
+                        "type": "string",
+                        "description": "The name of the map to find the token. Defaults to the current map."
+                    }
+                },
+                "isTrusted": true
+            }
+        ],
+        "notes": "Token IDs are unique, but Token Names can be duplicated. Using Token Name when more than one token has the same name can produce unexpected results.",
+        "wiki": "/clearLights"
+    },
+    {
+        "name": "clearRolls",
+        "aliases": [],
+        "description": "Clears the internal array that keeps track of the individual dice rolls for the current macro.",
+        "usages": [
+            {
+                "parameters": {}
+            }
+        ],
+        "wiki": "/clearRolls"
+    },
+    {
+        "name": "clearTable",
+        "aliases": [],
+        "description": "Removes all rows from the specified table.",
+        "usages": [
+            {
+                "parameters": {
+                    "tableName": {
+                        "type": "string",
+                        "description": "The name of the Table."
+                    }
+                }
+            }
+        ],
+        "wiki": "/clearTable"
+    },
+    {
+        "name": "closeDialog",
+        "aliases": [],
+        "description": "Closes the specified macro dialog that was previously created using [ dialog():].",
+        "usages": [
+            {
+                "parameters": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the dialog to close."
+                    }
+                }
+            }
+        ],
+        "notes": "If the dialog is not open then the function has no effect.",
+        "wiki": "/closeDialog"
+    },
+    {
+        "name": "closeFrame",
+        "aliases": [],
+        "description": "Closes the specified macro frame that was previously created using [frame():].",
+        "usages": [
+            {
+                "parameters": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the frame to close."
+                    }
+                }
+            }
+        ],
+        "notes": "If the frame is not open then the function has no effect.",
+        "wiki": "/closeFrame"
+    },
+    {
+        "name": "closeOverlay",
+        "aliases": [],
+        "description": "Closes/deregisters the specified overlay that was previously created using [overlay():].",
+        "usages": [
+            {
+                "parameters": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the overlay to close."
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "If the overlay is not registered then the function has no effect. Note that while each connected client can hide any overlay from the `Window > Overlays` menu, they still run in the background unless you use this function to close them.",
+        "wiki": "/closeOverlay"
+    },
+    {
+        "name": "copyMap",
+        "aliases": [],
+        "description": "Creates a copy of an specified map, with the new map name. Returns the name of the new map.",
+        "usages": [
+            {
+                "parameters": {
+                    "existingMapName": {
+                        "type": "string",
+                        "description": "The name of the existing map you wish to copy."
+                    },
+                    "newMapName": {
+                        "type": "string",
+                        "description": "The name of the new copy."
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "returns": "The name of the new map.",
+        "notes": "",
+        "wiki": "/copyMap"
+    },
+    {
+        "name": "copyTable",
+        "aliases": [],
+        "description": "Creates a copy (with a new name) of an existing MapTool table.",
+        "usages": [
+            {
+                "parameters": {
+                    "oldname": {
+                        "type": "string",
+                        "description": "The name of the existing table. It's an error if the table doesn't exist."
+                    },
+                    "newname": {
+                        "type": "string",
+                        "description": "The name of the new table to be created. It's an error if the table already exists."
+                    }
+                }
+            }
+        ],
+        "wiki": "/copyTable"
+    },
+    {
+        "name": "copyToken",
+        "aliases": [],
+        "description": "Creates one or more copies of a Token and returns the id of the created copy. This function is used to copy Tokens into the current map,",
+        "usages": [
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token to copy."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token to copy."
+                    },
+                    "numCopies": {
+                        "type": "number",
+                        "description": "The number of copies to create, defaults to `1`."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token to copy."
+                    },
+                    "numCopies": {
+                        "type": "number",
+                        "description": "The number of copies to create, defaults to `1`."
+                    },
+                    "fromMap": {
+                        "type": "string",
+                        "description": "The name of the map to copy from, defaults to the current map."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token to copy."
+                    },
+                    "numCopies": {
+                        "type": "number",
+                        "description": "The number of copies to create, defaults to `1`."
+                    },
+                    "fromMap": {
+                        "type": "string",
+                        "description": "The name of the map to copy from, defaults to the current map."
+                    },
+                    "updates": {
+                        "type": "JSON Object",
+                        "description": "A JSON Object that contains updates to be made to the copied Tokens."
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "returns": "If `numCopies` is 1, returns the `id` of the new token. If `numCopies` > 1, returns a JSON Array containing the Token ids of all the newly created Tokens.",
+        "notes": "See the wiki for details about the `updates` parameter.",
+        "wiki": "/copyToken"
+    },
+    {
+        "name": "countStrProp",
+        "aliases": [],
+        "description": "Returns the number of keys in a string property list.",
+        "usages": [
+            {
+                "parameters": {
+                    "propList": {
+                        "type": "string Property List",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "The number of keys in a string property list.",
+        "notes": "",
+        "wiki": "/countStrProp"
+    },
+    {
+        "name": "countsuccess",
+        "aliases": [
+            "success"
+        ],
+        "description": "Generates random numbers to emulate dice rolls; returns the count of dice rolls that are above a certain target number.",
+        "usages": [
+            {
+                "parameters": {
+                    "times": {
+                        "type": "number",
+                        "description": "The number of times to roll the die."
+                    },
+                    "sides": {
+                        "type": "number",
+                        "description": "The number of sides the die possesses."
+                    },
+                    "target": {
+                        "type": "number",
+                        "description": "The number that a die needs to be equal to or higher to be considered a success."
+                    }
+                }
+            }
+        ],
+        "returns": "The number of die rolls that are successes, i.e. the number of rolls with a result greater than or equal to `target`.",
+        "wiki": "/countsuccess"
+    },
+    {
+        "name": "createMacro",
+        "aliases": [],
+        "description": "Creates a macro button for the Current Token and returns the index of the newly created button.",
+        "usages": [
+            {
+                "parameters": {
+                    "label": {
+                        "type": "string",
+                        "description": "The label for the macro button."
+                    },
+                    "command": {
+                        "type": "strict",
+                        "description": "The command to run when the macro button is clicked, or the macro is called."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "label": {
+                        "type": "string",
+                        "description": "The label for the macro button."
+                    },
+                    "command": {
+                        "type": "strict",
+                        "description": "The command to run when the macro button is clicked, or the macro is called."
+                    },
+                    "props": {
+                        "type": [
+                            "string Property List",
+                            "JSON Object"
+                        ],
+                        "description": "A String Property List or JSON Object containing the properties for the button. "
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "label": {
+                        "type": "string",
+                        "description": "The label for the macro button."
+                    },
+                    "command": {
+                        "type": "strict",
+                        "description": "The command to run when the macro button is clicked, or the macro is called."
+                    },
+                    "props": {
+                        "type": [
+                            "string Property List",
+                            "JSON Object"
+                        ],
+                        "description": "A String Property List or JSON Object containing the properties for the button. "
+                    },
+                    "delim": {
+                        "type": "string",
+                        "description": "The delimiter used in the String Property List that is sent to the props parameter, defaults to `;`.\nIf you are sending a JSON Object to the props parameter, and using the id parameter, you should set this to `json`"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "label": {
+                        "type": "string",
+                        "description": "The label for the macro button."
+                    },
+                    "command": {
+                        "type": "strict",
+                        "description": "The command to run when the macro button is clicked, or the macro is called."
+                    },
+                    "props": {
+                        "type": [
+                            "string Property List",
+                            "JSON Object"
+                        ],
+                        "description": "A String Property List or JSON Object containing the properties for the button. "
+                    },
+                    "delim": {
+                        "type": "string",
+                        "description": "The delimiter used in the String Property List that is sent to the props parameter, defaults to `;`.\nIf you are sending a JSON Object to the props parameter, and using the id parameter, you should set this to `json`"
+                    },
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token that the macro is created on. From v1.15, accepts 'campaign' and 'gm' as ids for the relevant panels."
+                    }
+                },
+                "isTrusted": true
+            },
+            {
+                "parameters": {
+                    "label": {
+                        "type": "string",
+                        "description": "The label for the macro button."
+                    },
+                    "command": {
+                        "type": "strict",
+                        "description": "The command to run when the macro button is clicked, or the macro is called."
+                    },
+                    "props": {
+                        "type": [
+                            "string Property List",
+                            "JSON Object"
+                        ],
+                        "description": "A String Property List or JSON Object containing the properties for the button. "
+                    },
+                    "delim": {
+                        "type": "string",
+                        "description": "The delimiter used in the String Property List that is sent to the props parameter, defaults to `;`.\nIf you are sending a JSON Object to the props parameter, and using the id parameter, you should set this to `json`"
+                    },
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token that the macro is created on. From v1.15, accepts 'campaign' and 'gm' as ids for the relevant panels."
+                    },
+                    "mapname": {
+                        "type": "string",
+                        "description": "The name of the map to find the token. Defaults to the current map."
+                    }
+                },
+                "isTrusted": true
+            }
+        ],
+        "returns": "The index of the newly created button.",
+        "notes": "See the wiki for more information.",
+        "wiki": "/createMacro"
+    },
+    {
+        "name": "createMap",
+        "aliases": [],
+        "description": "Creates a map from the information in the required JSON object parameter.",
+        "usages": [
+            {
+                "parameters": {
+                    "name": {
+                        "type": "string",
+                        "description": "She name of the new map."
+                    },
+                    "config": {
+                        "type": "JSON object",
+                        "description": "Configuration for the new map."
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "See the wiki for more info about the `congig` parameter.",
+        "wiki": "/createMap"
+    },
+    {
+        "name": "createTable",
+        "aliases": [],
+        "description": "Creates an empty table, specifying its access levels and optional image.",
+        "usages": [
+            {
+                "parameters": {
+                    "tableName": {
+                        "type": "string",
+                        "description": "A string containing the name of the Table. **Warning: if a table with that name already exists it will be cleared.**"
+                    },
+                    "visible": {
+                        "type": "number",
+                        "description": "Whether or not the table can be seen by players in the Table Window, true(1) or false(0)."
+                    },
+                    "accessible": {
+                        "type": "number",
+                        "description": "Whether or not the table can be used by players to lookup values, true(1) or false(0)."
+                    },
+                    "imageId": {
+                        "type": "string",
+                        "description": "Optional and is the asset id of an image that will be used for the table in the Table Window."
+                    }
+                }
+            }
+        ],
+        "notes": "**Warning: If a table with the same name already exists, it will be overridden by the new table.**",
+        "wiki": "/createTable"
+    },
+    {
+        "name": "createToken",
+        "aliases": [],
+        "description": "Creates a token from the information in the required JSON object parameter.",
+        "usages": [
+            {
+                "parameters": {
+                    "config": {
+                        "type": "JSON Object",
+                        "description": "Configuration information for the new token; at a minimum must contain values under the `name` and `tokenImage` keys."
+                    }
+                }
+            }
+        ],
+        "returns": "The id of the created token.",
+        "notes": "The JSON object ",
+        "wiki": "/createToken"
+    },
+    {
+        "name": "createTokens",
+        "aliases": [],
+        "description": "Creates a token as per `createToken()` for each entry in the input array.",
+        "usages": [
+            {
+                "parameters": {
+                    "configs": {
+                        "type": "JSON Array",
+                        "description": "Array of config objects for the new tokens."
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "See `createToken()` for information about the elements of the `configs` array.",
+        "wiki": "/createTokens"
+    },
+    {
+        "name": "currentToken",
+        "aliases": [],
+        "description": "Returns the id of the Current Token.",
+        "usages": [
+            {
+                "parameters": {
+                }
+            }
+        ],
+        "returns": "The id of the Current Token.",
+        "notes": "In most cases this will return the same as `getImpersonated()` function. The difference is when it is called in a `[token():]` or after a call to the `switchToken()` function, in both these cases it will return the id of the token being operated on, while `getImpersonated()` will return the id of the impersonated token.",
+        "wiki": "/currentToken"
+    },
+    {
+        "name": "data.getData",
+        "aliases": [],
+        "description": "Returns a JSON dictionary containing the value held within the datastore under the named key. ",
+        "usages": [
+            {
+                "parameters": {
+                    "type": {
+                        "type": "string",
+                        "description": "Uri protocol for the data store. (Usually 'addon:')"
+                    },
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace for the data store."
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "The Key of the datum to retrieve."
+                    }
+                }
+            }
+        ],
+        "returns": "The value held within the datastore under the named key.",
+        "wiki": "/data.getData"
+    },
+    {
+        "name": "data.getStaticData",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace for the data store."
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "The Key of the datum to retrieve."
+                    }
+                }
+            }
+        ],
+        "returns": "The contents of the static data (usually a file).",
+        "notes": "Currently, the only type of data this function can return is for Add-On Libraries",
+        "wiki": "/data.getStaticData"
+    },
+    {
+        "name": "data.listData",
+        "aliases": [],
+        "description": "Enumerates all data in a namespace.",
+        "usages": [
+            {
+                "parameters": {
+                    "type": {
+                        "type": "string",
+                        "description": "Uri protocol for the data store. (Usually 'addon:')"
+                    },
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace for the data store."
+                    }
+                }
+            }
+        ],
+        "returns": "A JSON array of JSON dictionaries describing each element of data within the namespace.",
+        "notes": "",
+        "wiki": "/data.listData"
+    },
+    {
+        "name": "data.listNamespaces",
+        "aliases": [],
+        "description": "List data namespaces.",
+        "usages": [
+            {
+                "parameters": {
+                    "dataType": {
+                        "type": "string",
+                        "description": "Data schema (usually addon:)"
+                    }
+                }
+            }
+        ],
+        "returns": "A JSON Array of namespaces.",
+        "wiki": "/data.listNamespaces"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    }
+]
