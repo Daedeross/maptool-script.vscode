@@ -1,1 +1,1 @@
-[macro("fo@o:bar"): '']
+[macro("fo@o:bar"): add(bob, sue)]
