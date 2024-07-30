@@ -21,11 +21,12 @@ export interface DocumentRange extends IHaveRange {
     uri: string;
 }
 
-export interface SymbolRef extends IHaveRange {
-    name: string;
-    type: SymbolType;
+// Represents a single reference to a symbol in a document
+export interface DocumentSymbolRef extends IHaveRange {
+    all: SymbolRefs;
 }
 
+// Represents all references in the workspace for a symbol.
 export interface SymbolRefs {
     name: string;
     type: SymbolType;
@@ -64,7 +65,7 @@ export const loadBuiltInFunctions = (): Map<string, FunctionDefinition> => {
 
     const all_functions = new Map<string, FunctionDefinition>();
 
-    for (const def of builtin_functions) {
+    for (const def of builtin_functions.filter(f => f.name.length > 0)) {
         const f_def = def as FunctionDefinition;
         if (isNil(f_def.usages)) {
             f_def.usages = [{}]
@@ -84,50 +85,33 @@ export const loadBuiltInFunctions = (): Map<string, FunctionDefinition> => {
     return all_functions;
 }
 
-export const generateSymbolsFromFunctions =
-    (allSymbols: AllSymbols, functions: Map<string, FunctionDefinition>) => {
+// export const addSymbols =
+//     (allSymbols: AllSymbols, symbols: Array<DocumentSymbolRef>, uri: string) => {
+//         for (let s_ref of symbols) {
+//             addOrUpdate(
+//                 allSymbols.byName,
+//                 s_ref.name,
+//                 _ => {
+//                     const newRef = {
+//                         name: s_ref.name,
+//                         type: s_ref.type,
+//                         builtin: false,
+//                         locations: [{
+//                             range: s_ref.range,
+//                             uri
+//                         }]
+//                     };
+//                     allSymbols.trie.add(newRef);
 
-        functions
-            .forEach((f, k) => {
-                var refs = {
-                    name: f.name,
-                    type: SymbolType.function,
-                    builtin: true,
-                    locations: []
-                } as SymbolRefs;
-
-                allSymbols.byName.set(refs.name, refs);
-                allSymbols.trie.add(refs);
-            })
-    }
-
-export const addSymbools =
-    (allSymbols: AllSymbols, symbols: Array<SymbolRef>, uri: string) => {
-        for (let s_ref of symbols) {
-            addOrUpdate(
-                allSymbols.byName,
-                s_ref.name,
-                _ => {
-                    const newRef = {
-                        name: s_ref.name,
-                        type: s_ref.type,
-                        builtin: false,
-                        locations: [{
-                            range: s_ref.range,
-                            uri
-                        }]
-                    };
-                    allSymbols.trie.add(newRef);
-
-                    return newRef;
-                },
-                (k, v) => {
-                    v.locations.push({ range: s_ref.range, uri })
-                    return v;
-                }
-            );
-        }
-    }
+//                     return newRef;
+//                 },
+//                 (k, v) => {
+//                     v.locations.push({ range: s_ref.range, uri })
+//                     return v;
+//                 }
+//             );
+//         }
+//     }
 
 export const resetSymbols = (allSymbols: AllSymbols) => {
     allSymbols.trie.reset();

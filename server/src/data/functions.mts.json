@@ -1291,6 +1291,656 @@
         "wiki": "/data.listNamespaces"
     },
     {
+        "name": "data.listTypes",
+        "aliases": [],
+        "description": "Returns an array of valid strings for use in data functions in the `type` argument.",
+        "usages": [
+            {
+                "parameters": {
+                    "type": {
+                        "type": "string",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "Array or strings.",
+        "wiki": "/data.listTypes"
+    },
+    {
+        "name": "data.removeData",
+        "aliases": [],
+        "description": "Unknown",
+        "usages": [
+            {
+                "parameters": {
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/data.removeData"
+    },
+    {
+        "name": "data.setData",
+        "aliases": [],
+        "description": "Unknown",
+        "usages": [
+            {
+                "parameters": {
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/data.setData"
+    },
+    {
+        "name": "decode",
+        "aliases": [],
+        "description": "Decodes a string that was encoded with the `encode()` function.",
+        "usages": [
+            {
+                "parameters": {
+                    "str": {
+                        "type": "string",
+                        "description": "The string to decode."
+                    }
+                }
+            }
+        ],
+        "returns": "The decoded string.",
+        "wiki": "/decode"
+    },
+    {
+        "name": "defineAudioSource",
+        "aliases": [],
+        "description": "Assign a nickname to an audio source and optionally preload it or set playback values.",
+        "usages": [
+            {
+                "parameters": {
+                    "nickname": {
+                        "type": "string",
+                        "description": "The nickname of the file. For example, 'tense music'"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "The URI/URL of the file. For example, `http://www.mywebsite/mysong.mp3` or `file:/C:/mysong.mp3`"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "nickname": {
+                        "type": "string",
+                        "description": "The nickname of the file. For example, 'tense music'"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "The URI/URL of the file. For example, `http://www.mywebsite/mysong.mp3` or `file:/C:/mysong.mp3`"
+                    },
+                    "preload": {
+                        "type": "string",
+                        "description": " A string indicating if the audio should be pre-loaded or not. If set to `clip`, preloads it as a clip. If set to `stream`, preloads it as a stream. Any other string does not preload the audio source."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "nickname": {
+                        "type": "string",
+                        "description": "The nickname of the file. For example, 'tense music'"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "The URI/URL of the file. For example, `http://www.mywebsite/mysong.mp3` or `file:/C:/mysong.mp3`"
+                    },
+                    "preload": {
+                        "type": "string",
+                        "description": " A string indicating if the audio should be pre-loaded or not. If set to `clip`, preloads it as a clip. If set to `stream`, preloads it as a stream. Any other string does not preload the audio source."
+                    },
+                    "cycleCount": {
+                        "type": "number",
+                        "description": "Set the default number of times the audio should play. If set to -1, the file is played continuously."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "nickname": {
+                        "type": "string",
+                        "description": "The nickname of the file. For example, 'tense music'"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "The URI/URL of the file. For example, `http://www.mywebsite/mysong.mp3` or `file:/C:/mysong.mp3`"
+                    },
+                    "preload": {
+                        "type": "string",
+                        "description": " A string indicating if the audio should be pre-loaded or not. If set to `clip`, preloads it as a clip. If set to `stream`, preloads it as a stream. Any other string does not preload the audio source."
+                    },
+                    "cycleCount": {
+                        "type": "number",
+                        "description": "Set the default number of times the audio should play. If set to -1, the file is played continuously."
+                    },
+                    "volume": {
+                        "type": "number",
+                        "description": "Set the default volume the audio is to be played at. Can range from 0 to 1."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "nickname": {
+                        "type": "string",
+                        "description": "The nickname of the file. For example, 'tense music'"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "The URI/URL of the file. For example, `http://www.mywebsite/mysong.mp3` or `file:/C:/mysong.mp3`"
+                    },
+                    "preload": {
+                        "type": "string",
+                        "description": " A string indicating if the audio should be pre-loaded or not. If set to `clip`, preloads it as a clip. If set to `stream`, preloads it as a stream. Any other string does not preload the audio source."
+                    },
+                    "cycleCount": {
+                        "type": "number",
+                        "description": "Set the default number of times the audio should play. If set to -1, the file is played continuously."
+                    },
+                    "volume": {
+                        "type": "number",
+                        "description": "Set the default volume the audio is to be played at. Can range from 0 to 1."
+                    },
+                    "start": {
+                        "type": "number",
+                        "description": "Set the default time offset in seconds where audio should start playing, or restart from when repeating. Streams only."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "nickname": {
+                        "type": "string",
+                        "description": "The nickname of the file. For example, 'tense music'"
+                    },
+                    "uri": {
+                        "type": "string",
+                        "description": "The URI/URL of the file. For example, `http://www.mywebsite/mysong.mp3` or `file:/C:/mysong.mp3`"
+                    },
+                    "preload": {
+                        "type": "string",
+                        "description": " A string indicating if the audio should be pre-loaded or not. If set to `clip`, preloads it as a clip. If set to `stream`, preloads it as a stream. Any other string does not preload the audio source."
+                    },
+                    "cycleCount": {
+                        "type": "number",
+                        "description": "Set the default number of times the audio should play. If set to -1, the file is played continuously."
+                    },
+                    "volume": {
+                        "type": "number",
+                        "description": "Set the default volume the audio is to be played at. Can range from 0 to 1."
+                    },
+                    "start": {
+                        "type": "number",
+                        "description": "Set the default time offset in seconds where audio should start playing, or restart from when repeating. Streams only."
+                    },
+                    "stop": {
+                        "type": "number",
+                        "description": " Set the default time offset where audio should stop playing or restart when repeating. Streams only."
+                    }
+                }
+            }
+        ],
+        "notes": "The source can now be played with `playStream()`.",
+        "wiki": "/defineAudioSource"
+    },
+    {
+        "name": "defineFunction",
+        "aliases": [],
+        "description": "Defines a user function that can be used anywhere that core functions can be used.",
+        "usages": [
+            {
+                "parameters": {
+                    "function": {
+                        "type": "string",
+                        "description": "The name of the user defined function to be defined."
+                    },
+                    "macro": {
+                        "type": "string",
+                        "description": "The name and location of the macro that is called when the user defined function is used."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "function": {
+                        "type": "string",
+                        "description": "The name of the user defined function to be defined."
+                    },
+                    "macro": {
+                        "type": "string",
+                        "description": "The name and location of the macro that is called when the user defined function is used."
+                    },
+                    "ignoreOutput": {
+                        "type": "number",
+                        "description": " If the defined function should ignore all output and only return the value of `macro.return`, defaults to false(`0`)."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "function": {
+                        "type": "string",
+                        "description": "The name of the user defined function to be defined."
+                    },
+                    "macro": {
+                        "type": "string",
+                        "description": "The name and location of the macro that is called when the user defined function is used."
+                    },
+                    "ignoreOutput": {
+                        "type": "number",
+                        "description": " If the defined function should ignore all output and only return the value of `macro.return`, defaults to false(`0`)."
+                    },
+                    "newScope": {
+                        "type": "number",
+                        "description": "Whether the defined function should create a new variable scope when executed. Defaults to true(`1`)."
+                    }
+                }
+            }
+        ],
+        "notes": "See the wiki for more information.",
+        "wiki": "/defineFunction"
+    },
+    {
+        "name": "deleteStrProp",
+        "aliases": [],
+        "description": "Returns a copy of the string property list with the specified key (and corresponding valye) removed.",
+        "usages": [
+            {
+                "parameters": {
+                    "props": {
+                        "type": "String property list",
+                        "description": "The input property list."
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "The key to remove."
+                    }
+                }
+            }
+        ],
+        "returns": "A copy of the input property list with the specified key removed.",
+        "wiki": "/deleteStrProp"
+    },
+    {
+        "name": "deleteTable",
+        "aliases": [],
+        "description": "Removes the specified table from the campaign.",
+        "usages": [
+            {
+                "parameters": {
+                    "tableName": {
+                        "type": "string",
+                        "description": "The name of the table to be deleted."
+                    }
+                }
+            }
+        ],
+        "wiki": "/deleteTable"
+    },
+    {
+        "name": "deleteTableEntry",
+        "aliases": [],
+        "description": "Removes a row from the specified table.",
+        "usages": [
+            {
+                "parameters": {
+                    "tableName": {
+                        "type": "string",
+                        "description": ""
+                    },
+                    "roll": {
+                        "type": "number",
+                        "description": "An integer and the value that specifies the row to be removed."
+                    }
+                }
+            }
+        ],
+        "notes": "Deleting a row from a table will not automatically change the table row value, so this should be updated to avoid possible errors.",
+        "wiki": "/deleteTableEntry"
+    },
+    {
+        "name": "deselectTokens",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                }
+            },
+            {
+                "parameters": {
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token id or Token Name of the token to deselect; if left blank all currently selected tokens are deselected."
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "tokens": {
+                        "type": "string",
+                        "description": "A String List of tokens to deselect."
+                    },
+                    "delim": {
+                        "type": "string",
+                        "description": "Specifies the delimiter used in the string list that is supplied. Use `json` for JSON Arrays."
+                    }
+                }
+            }
+        ],
+        "notes": "Token IDs are unique, but Token Names can be duplicated. Using Token Name when more than one token has the same name can produce unexpected results.",
+        "wiki": "/deselectTokens"
+    },
+    {
+        "name": "divide",
+        "aliases": [],
+        "description": "Divides the first number by the second number, and then divides that result by the third number -if present- and so on for all the numbers passed to the function.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The numbers to divide.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "The result of the division.",
+        "wiki": "/divide"
+    },
+    {
+        "name": "drawCoverVBL",
+        "aliases": [],
+        "description": "Draws Cover Vision Blocking Layer (Cover VBL) shapes.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "A JSON Array of JSON objects, one of the latter for each Cover VBL shape."
+                    }
+                }
+            }
+        ],
+        "notes": "See `drawVBL()` for a complete description of possible shapes.",
+        "wiki": "/drawCoverVBL"
+    },
+    {
+        "name": "drawHillVBL",
+        "aliases": [],
+        "description": "Draws Hill Vision Blocking Layer (Hill VBL) shapes.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "A JSON Array of JSON objects, one of the latter for each Hill VBL shape."
+                    }
+                }
+            }
+        ],
+        "notes": "See `drawVBL()` for a complete description of possible shapes.",
+        "wiki": "/drawHillVBL"
+    },
+    {
+        "name": "drawMBL",
+        "aliases": [],
+        "description": "Draws Movement Blocking Layer (MBL) shapes.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "A JSON Array of JSON objects, one of the latter for each MBL shape."
+                    }
+                }
+            }
+        ],
+        "notes": "See `drawVBL()` for a complete description of possible shapes.",
+        "wiki": "/drawMBL"
+    },
+    {
+        "name": "drawPitVBL",
+        "aliases": [],
+        "description": "Draws Pit Vision Blocking Layer (Pit VBL) shapes.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "A JSON Array of JSON objects, one of the latter for each Pit VBL shape."
+                    }
+                }
+            }
+        ],
+        "notes": "See `drawVBL()` for a complete description of possible shapes.",
+        "wiki": "/drawPitVBL"
+    },
+    {
+        "name": "drawVBL",
+        "aliases": [],
+        "description": "Draws Wall Vision Blocking Layer (Wall VBL) shapes.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "A JSON Array of JSON objects, one of the latter for each Pit VBL shape."
+                    }
+                }
+            }
+        ],
+        "notes": "See the wiki for a complete description of possible shapes.",
+        "wiki": "/drawVBL"
+    },
+    {
+        "name": "drop",
+        "aliases": [],
+        "description": "Generates random numbers to emulate dice rolls; returns the total of a dice roll that ignores a certain number of the lowest dice rolled.",
+        "usages": [
+            {
+                "parameters": {
+                    "times": {
+                        "type": "number",
+                        "description": "The number of times to roll the dice."
+                    },
+                    "sides": {
+                        "type": "number",
+                        "description": "The number of sides the dice possess."
+                    },
+                    "ignore": {
+                        "type": "number",
+                        "description": "The number of *lowest* rolls that are ignored when totaling the roll."
+                    }
+                }
+            }
+        ],
+        "returns": "The sum result of the dice roll.",
+        "notes": "For another method of rolling dice, see **Dice Expressions**.",
+        "wiki": "/drop"
+    },
+    {
+        "name": "dropHighest",
+        "aliases": [],
+        "description": "Generates random numbers to emulate dice rolls; returns the total of a dice roll that ignores a certain number of the highest dice rolled.",
+        "usages": [
+            {
+                "parameters": {
+                    "times": {
+                        "type": "number",
+                        "description": "The number of times to roll the dice."
+                    },
+                    "sides": {
+                        "type": "number",
+                        "description": "The number of sides the dice possess."
+                    },
+                    "ignore": {
+                        "type": "number",
+                        "description": "The number of *highest* rolls that are ignored when totaling the roll."
+                    }
+                }
+            }
+        ],
+        "returns": "The sum result of the dice roll.",
+        "notes": "For another method of rolling dice, see **Dice Expressions**.",
+        "wiki": "/dropHighest"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
+        "name": "",
+        "aliases": [],
+        "description": "",
+        "usages": [
+            {
+                "parameters": {
+                    "_param": {
+                        "type": "",
+                        "description": ""
+                    }
+                }
+            }
+        ],
+        "returns": "",
+        "notes": "",
+        "wiki": "/"
+    },
+    {
         "name": "",
         "aliases": [],
         "description": "",

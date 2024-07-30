@@ -7,7 +7,7 @@
                 "**/*.mts.json"
             ],
             "schema": true,
-            "url": "server/src/data/_functions.schema.json"
+            "url": "/server/src/data/_functions.schema.json"
         }
     ]
 }

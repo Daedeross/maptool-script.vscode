@@ -36,6 +36,13 @@
         "configuration": "./language-configuration.json"
       }
     ],
+    "grammars": [
+      {
+        "language": "mts",
+        "scopeName": "source.mts",
+        "path": "./syntaxes/mts.tmLanguage.json"
+      }
+    ],
     "configurationDefaults": {
       "[mts]": {
         "editor.semanticHighlighting.enabled": true
@@ -72,6 +79,12 @@
           "scope": "window",
           "type": "boolean",
           "default": false
+        },
+        "mapToolScriptServer.wikiUriRoot": {
+          "scope": "window",
+          "type": "string",
+          "default": "https://wiki.rptools.info/index.php",
+          "description": "The root URL for the MapTool wiki; what queries should be appended to."
         },
         "mapToolScriptServer.maxNumberOfProblems": {
           "scope": "resource",

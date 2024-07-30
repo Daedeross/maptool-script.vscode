@@ -48,7 +48,7 @@ import {
     VariableContext
 } from "./grammars/MTScriptParser";
 import MTScriptParserVisitor from "./grammars/MTScriptParserVisitor";
-import { SymbolRef, SymbolType } from "./function_data";
+import { IHaveRange, SymbolType } from "./function_data";
 
 export enum TokenType {
     string = 0,
@@ -60,6 +60,13 @@ export enum TokenType {
     function,
     variable,
 }
+
+// 
+export interface FoundSymbol extends IHaveRange {
+    name: string;
+    type: SymbolType;
+}
+
 
 const nameOf = (t: TokenType) => TokenType[t];
 
@@ -120,7 +127,7 @@ const AddGet = (map: Map<string, VariableUsage>, name: string, position: number,
 
 export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     private builder = new SemanticTokensBuilder();
-    private symbols: Array<SymbolRef> = [];
+    private symbols: Array<FoundSymbol> = [];
     public vars = new Map<string, VariableUsage>();
     public diagnostics: Array<Diagnostic> = [];
 
@@ -191,8 +198,10 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     }
 
     visitIfThen = (ctx: IfThenContext) => {
+        ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_IF().symbol, TokenType.keyword);
         this.visit(ctx.expression());
+        ctx._second?.accept(this);
         pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         ctx._true_.accept(this);
         pushToken(this.builder, ctx.SEMI().symbol, TokenType.colon);
@@ -200,8 +209,10 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     }
 
     visitIfThenCode = (ctx: IfThenCodeContext) => {
+        ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_IF().symbol, TokenType.keyword);
         this.visit(ctx.expression());
+        ctx._second?.accept(this);
         pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
         ctx._true_.accept(this);
@@ -304,7 +315,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
             this.visit(variable);
             var text = variable.getText();
             AddSet(this.vars, text, variable.start.start);
-            this.symbols.push
+            //this.symbols.push();  // TODO: push symbol ref
             argCount++;
         }
 
@@ -478,5 +489,6 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         const col = ctx.start.column;
 
         this.builder.push(line, col, text.length, TokenType.variable, 0);
+        // TODO: Add symbol
     }
 };

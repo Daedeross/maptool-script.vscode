@@ -29,13 +29,13 @@ simpleScript
     ;
 
 ifThen
-    : (rollOptions COMMA)? KEYWORD_IF LPAREN expression RPAREN
-      rollOptions? COLON true=statement SEMI false=statement
+    : (first=rollOptions COMMA)? KEYWORD_IF LPAREN expression RPAREN
+      second=rollOptions? COLON true=statement SEMI false=statement
     ;
 
 ifThenCode
-    : (rollOptions COMMA)? KEYWORD_IF LPAREN expression RPAREN
-      rollOptions? COMMA KEYWORD_CODE COLON true=block SEMI false=block
+    : (first=rollOptions COMMA)? KEYWORD_IF LPAREN expression RPAREN
+      second=rollOptions? COMMA KEYWORD_CODE COLON true=block SEMI false=block
     ;
 
 switch

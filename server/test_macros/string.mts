@@ -1,1 +1,1 @@
-["foo:bar"]
+[macro("fo@o:bar"): '']

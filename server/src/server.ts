@@ -31,123 +31,48 @@ import {
 } from 'vscode-languageserver-textdocument';
 
 import { defaultTo, isNil, last, min, sortBy } from 'lodash';
-import TrieSearch from 'trie-search';
 
-import { CharStream, CommonTokenStream } from 'antlr4';
-import MTScript2Lexer from './grammars/MTScriptLexer';
-import MTScript2Parser from './grammars/MTScriptParser';
-import { MTScriptVisitor, MTScriptLegend, VariableUsage } from './visitor';
-import { addSymbools as addSymbols, AllSymbols, FunctionUsage, generateSymbolsFromFunctions, loadBuiltInFunctions, resetSymbols, SymbolRef, SymbolRefs, SymbolType } from './function_data';
+import { MTScriptVisitor } from './visitor';
+import { resetSymbols, SymbolRefs, SymbolType } from './function_data';
 import { constructFunctionHover, getFunctionAtPosition, getWord, parametersToSignature, symbolToCompletionItemKind } from './utils';
-
-const MTS = 'mts';  // languageId
-
-interface MtsDocument {
-    uri: string;    // uri that points to TextDoccument instance
-    tokens: SemanticTokens;
-    diagnostics: Array<Diagnostic>;
-    vars: Map<string, VariableUsage>;
-    symbols: Array<SymbolRef>;
-}
-
-// map of all? built-in MapToolScript functions
-const BuiltInFunctions = loadBuiltInFunctions();
+import { defaultSettings, MtsDocument, WorkspaceManager } from './workspace_manager';
+import { MtsSettings } from './mts_settings';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
 
 // Create a simple text document manager.
-const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
-const mtScripts: Map<string, MtsDocument> = new Map<string, MtsDocument>();
-const allSymbols: AllSymbols =  {
-    byName: new Map<string, SymbolRefs>(),
-    trie: new TrieSearch<SymbolRefs>('name')
-};
+const manager: WorkspaceManager = new WorkspaceManager(connection);
+// const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+// const mtScripts: Map<string, MtsDocument> = new Map<string, MtsDocument>();
+// const allSymbols: AllSymbols =  {
+//     byName: new Map<string, SymbolRefs>(),
+//     trie: new TrieSearch<SymbolRefs>('name')
+// };
 
-generateSymbolsFromFunctions(allSymbols, BuiltInFunctions);
-
-let hasConfigurationCapability = false;
-let hasWorkspaceFolderCapability = false;
-let hasDiagnosticRelatedInformationCapability = false;
-
-connection.onInitialize((params: InitializeParams) => {
-    const capabilities = params.capabilities;
-
-    // Does the client support the `workspace/configuration` request?
-    // If not, we fall back using global settings.
-    hasConfigurationCapability = !!(
-        capabilities.workspace && !!capabilities.workspace.configuration
-    );
-    hasWorkspaceFolderCapability = !!(
-        capabilities.workspace && !!capabilities.workspace.workspaceFolders
-    );
-    hasDiagnosticRelatedInformationCapability = !!(
-        capabilities.textDocument &&
-        capabilities.textDocument.publishDiagnostics &&
-        capabilities.textDocument.publishDiagnostics.relatedInformation
-    );
-
-    const result: InitializeResult = {
-        capabilities: {
-            textDocumentSync: TextDocumentSyncKind.Incremental,
-            // Tell the client that this server supports code completion.
-            completionProvider: {
-                resolveProvider: true
-            },
-            diagnosticProvider: {
-                interFileDependencies: false,
-                workspaceDiagnostics: false
-            },
-            semanticTokensProvider: {
-                legend: MTScriptLegend,
-                full: true
-            },
-            hoverProvider: true
-        }
-    };
-    if (hasWorkspaceFolderCapability) {
-        result.capabilities.workspace = {
-            workspaceFolders: {
-                supported: true
-            }
-        };
-    }
-    return result;
-});
+connection.onInitialize(manager.initialize);
 
 connection.onInitialized(async () => {
-    if (hasConfigurationCapability) {
+    if (manager.hasConfigurationCapability) {
         // Register for all configuration changes.
         connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
-    if (hasWorkspaceFolderCapability) {
+    if (manager.hasWorkspaceFolderCapability) {
         connection.workspace.onDidChangeWorkspaceFolders(_event => {
             connection.console.log('Workspace folder change event received.');
         });
     }
 });
 
-// The example settings
-interface ExampleSettings {
-    maxNumberOfProblems: number;
-}
-
-// The global settings, used when the `workspace/configuration` request is not supported by the client.
-// Please note that this is not the case when using this server with the client provided in this example
-// but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
-let globalSettings: ExampleSettings = defaultSettings;
-
-// Cache the settings of all open documents
-const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+let globalSettings: MtsSettings = defaultSettings;
 
 connection.onDidChangeConfiguration(change => {
-    if (hasConfigurationCapability) {
+    if (manager.hasConfigurationCapability) {
         // Reset all cached document settings
-        documentSettings.clear();
+        manager.documentSettings.clear();
     } else {
-        globalSettings = <ExampleSettings>(
+        globalSettings = <MtsSettings>(
             (change.settings.mapToolScriptServer || defaultSettings)
         );
     }
@@ -157,34 +82,23 @@ connection.onDidChangeConfiguration(change => {
     connection.languages.diagnostics.refresh();
 });
 
-function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
-    if (!hasConfigurationCapability) {
+function getDocumentSettings(resource: string): Thenable<MtsSettings> {
+    if (!manager.hasConfigurationCapability) {
         return Promise.resolve(globalSettings);
     }
-    let result = documentSettings.get(resource);
+    let result = manager.documentSettings.get(resource);
     if (!result) {
         result = connection.workspace.getConfiguration({
             scopeUri: resource,
             section: 'mapToolScriptServer'
         });
-        documentSettings.set(resource, result);
+        manager.documentSettings.set(resource, result);
     }
     return result;
 }
 
-// 
-// documents.onDidOpen(async e => {
-
-// });
-
-// Only keep settings for open documents
-documents.onDidClose(e => {
-    documentSettings.delete(e.document.uri);
-    mtScripts.delete(e.document.uri);
-});
-
 connection.languages.diagnostics.on(async (params) => {
-    const document = documents.get(params.textDocument.uri);
+    const document = manager.documents.get(params.textDocument.uri);
     if (document !== undefined) {
         return {
             kind: DocumentDiagnosticReportKind.Full,
@@ -201,7 +115,7 @@ connection.languages.diagnostics.on(async (params) => {
 });
 
 connection.onHover((params) => {
-    const script = mtScripts.get(params.textDocument.uri);
+    const script = manager.mtScripts.get(params.textDocument.uri);
     if (isNil(script)) {
         return;
     }
@@ -211,18 +125,18 @@ connection.onHover((params) => {
         return;
     }
 
-    const f_def = BuiltInFunctions.get(f_ref.name);
+    const f_def = WorkspaceManager.BuiltInFunctions.get(f_ref.all.name);
     if (isNil(f_def)) {
         return {
             contents: {
                 kind: MarkupKind.PlainText,
-                value: `${f_ref.name}`
+                value: `${f_ref.all.name}`
             },
             range: f_ref.range
         };
     } else {
         return {
-            contents: constructFunctionHover(f_def),
+            contents: constructFunctionHover(globalSettings.wikiUriRoot, f_def),
             range: f_ref.range
         };
     }
@@ -230,22 +144,22 @@ connection.onHover((params) => {
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
-documents.onDidChangeContent(async change => {
-    const textDocument = change.document;
-    if (textDocument.languageId === MTS) {
-        const mts = await getScriptInfo(textDocument.uri)
-        if (isNil(mts)) { return; }
+// manager.documents.onDidChangeContent(async change => {
+//     const textDocument = change.document;
+//     if (textDocument.languageId === MTS) {
+//         const mts = await getScriptInfo(textDocument.uri)
+//         if (isNil(mts)) { return; }
 
-        mtScripts.set(mts.uri, mts);
-    } else if (mtScripts.has(textDocument.uri)) {
-        mtScripts.delete(textDocument.uri);
-    }
-    // validateTextDocument(textDocument)
-    //     .then(diagnostics => connection.sendDiagnostics({ uri: textDocument.uri, diagnostics }));
-});
+//         manager.mtScripts.set(mts.uri, mts);
+//     } else if (mtScripts.has(textDocument.uri)) {
+//         manager.mtScripts.delete(textDocument.uri);
+//     }
+//     // validateTextDocument(textDocument)
+//     //     .then(diagnostics => connection.sendDiagnostics({ uri: textDocument.uri, diagnostics }));
+// });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
-    const script = mtScripts.get(textDocument.uri);
+    const script = manager.mtScripts.get(textDocument.uri);
 
     if (isNil(script)) {
         return [];
@@ -308,40 +222,9 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
 //     return tkns;
 // }
 
-async function getScriptInfo(uri: string): Promise<MtsDocument | null> {
-    const textDocument = documents.get(uri);
-
-    if (isNil(textDocument)) { return null; }
-
-    const chars = new CharStream(textDocument.getText());
-    const lexer = new MTScript2Lexer(chars);
-    const tokens = new CommonTokenStream(lexer);
-    const parser = new MTScript2Parser(tokens);
-    const tree = parser.macro();
-    const visitor = new MTScriptVisitor();
-    visitor.visit(tree);
-
-    // sort functions by start position
-    const symbols = sortBy(visitor.getSymbols(), f => f.range.start.line, f => f.range.start.character);
-    const semanticTokens = visitor.getTokens();
-
-    resetSymbols(allSymbols);
-    addSymbols(allSymbols, symbols, uri);
-
-    return {
-        uri: uri,
-        symbols,
-        vars: visitor.vars,
-        diagnostics: visitor.diagnostics,
-        tokens: semanticTokens
-    }
-}
-
 connection.onRequest("textDocument/semanticTokens/full", async (params) => {
     const uri = params.textDocument.uri;
-    if (mtScripts.has(uri)) {
-        return mtScripts.get(uri)?.tokens
-    }
+    return manager.mtScripts.get(uri)?.tokens
 });
 
 connection.onDidChangeWatchedFiles(_change => {
@@ -357,7 +240,7 @@ function symbolToCompletionItem(x: SymbolRefs, word: Range): CompletionItem {
     };
 
     if (x.type == SymbolType.function) {
-        const f_def = BuiltInFunctions.get(x.name);
+        const f_def = WorkspaceManager.BuiltInFunctions.get(x.name);
         if(!isNil(f_def?.usages)) {
             item.labelDetails = {
                 detail: ' ' + parametersToSignature(last(f_def.usages))
@@ -372,7 +255,7 @@ function symbolToCompletionItem(x: SymbolRefs, word: Range): CompletionItem {
 connection.onCompletion(
     (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
         try {
-            const document = documents.get(_textDocumentPosition.textDocument.uri);
+            const document = manager.documents.get(_textDocumentPosition.textDocument.uri);
             if (isNil(document)) {
                 return [];
             }
@@ -390,7 +273,7 @@ connection.onCompletion(
                     },
                     end: _textDocumentPosition.position
                 };
-                const results = allSymbols.trie.search(word);
+                const results = manager.symbolsTrie.search(word);
                 if (results.length > 0) {
                     return results.map( x => symbolToCompletionItem(x, range));
                 }
@@ -423,10 +306,6 @@ connection.onCompletionResolve(
         return item;
     }
 );
-
-// Make the text document manager listen on the connection
-// for open, change and close text document events
-documents.listen(connection);
 
 // Listen on the connection
 connection.listen();

@@ -1,12 +1,23 @@
 import { CompletionItem, CompletionItemKind, MarkupContent, MarkupKind, Position, Range } from "vscode-languageserver";
-import { FunctionDefinition, FunctionUsage, SymbolRef, SymbolRefs, SymbolType } from "./function_data";
-import { isEmpty, isNil, last, sortedLastIndexBy } from "lodash";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { isEmpty, isNil, last, sortedLastIndexBy } from "lodash";
 
-export const getFunctionAtPosition = (symbols: Array<SymbolRef>, position: Position): SymbolRef | undefined => {
-    const dummy: SymbolRef = {
-        name: '',
-        type: SymbolType.unknown,
+import { CharStream, CommonTokenStream } from 'antlr4';
+import MTScript2Lexer from './grammars/MTScriptLexer';
+import MTScript2Parser from './grammars/MTScriptParser';
+import { FunctionDefinition, FunctionUsage, DocumentSymbolRef, SymbolRefs, SymbolType } from "./function_data";
+
+export const MTS = 'mts';  // languageId
+
+export const positionIteree = (pos: Position) => pos.line * 1000 + pos.character;
+
+export const getFunctionAtPosition = (symbols: Array<DocumentSymbolRef>, position: Position): DocumentSymbolRef | undefined => {
+    const dummy: DocumentSymbolRef = {
+        all: {
+            name: '',
+            type: SymbolType.unknown,
+            locations: []
+        },
         range: {
             start: position,
             end: position
@@ -14,11 +25,12 @@ export const getFunctionAtPosition = (symbols: Array<SymbolRef>, position: Posit
     }
 
     // @ts-ignore
-    const start = sortedLastIndexBy(symbols, dummy, f => f.range.start.line, f => f.range.start.character );
+    const start = sortedLastIndexBy(symbols, dummy, f => positionIteree(f.range.start) );
 
     if (start > 0) {
         const f_ref = symbols[start - 1];
-        if (position.character <= f_ref.range.end.character) {
+        if (position.line === f_ref.range.start.line
+            && position.character <= f_ref.range.end.character) {
             return f_ref;
         }
     }
@@ -39,7 +51,7 @@ export const parametersToSignature = (usage: FunctionUsage | undefined | null): 
     return usageString;
 }
 
-export const constructFunctionHover = (f_def: FunctionDefinition): MarkupContent => {
+export const constructFunctionHover = (wikiRoot: string, f_def: FunctionDefinition): MarkupContent => {
     const usage = last(f_def.usages);
     let usageString = '( ';
     let paramString = ''
@@ -55,7 +67,10 @@ export const constructFunctionHover = (f_def: FunctionDefinition): MarkupContent
         usageString += ')'
     }
 
-    const value = `#### **${f_def.name}**${usageString}\n\n${f_def.description}${paramString}`
+    const wiki = isNil(f_def.wiki)
+        ? ''
+        : `\n\nWiki: [${f_def.name}](${wikiRoot}${f_def.wiki})`;
+    const value = `#### **${f_def.name}**${usageString}\n\n${f_def.description}${paramString}${wiki}`
 
     return {
         kind: MarkupKind.Markdown,
@@ -74,7 +89,7 @@ export function addOrUpdate<K, V>(map: Map<K, V>, key: K, addValue: (k: K) => V,
     return newValue;
 }
 
-const LastWordRE = /(?<=\b)\w+$/;
+const LastWordRE = /(?<=[^\w])\w+$/;
 
 export const getWord = (document: TextDocument, position: Position): string | null => {
     const range: Range = {
@@ -105,4 +120,12 @@ export const symbolToCompletionItemKind = (x: SymbolType): CompletionItemKind =>
         default:
             return CompletionItemKind.Text;
     }
+}
+
+export const getParseTree = (document: TextDocument) => {
+    const chars = new CharStream(document.getText());
+    const lexer = new MTScript2Lexer(chars);
+    const tokens = new CommonTokenStream(lexer);
+    const parser = new MTScript2Parser(tokens);
+    return parser.macro();
 }
