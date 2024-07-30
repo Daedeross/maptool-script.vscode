@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Variable usage before assignment waring.
   - For-loop argument validation.
 
+## [0.1.3]
+
+### Fixed
+
+- Fixed #8: Colon used for identifying library in MACRO roll option breaks highlighting.
+
 ## [0.1.2]
 
 ### Fixed
