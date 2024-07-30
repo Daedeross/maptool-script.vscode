@@ -27,11 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Splitting code across muliple lines breaks highlighting
-- Colon used for identifying library in MACRO roll option breaks highlighting
 
-### Removed
+## [0.1.3]
 
-- Temporarily removed
+### Fixed
+
+- Fixed #8: Colon used for identifying library in MACRO roll option breaks highlighting.
 
 ## [0.1.2]
 

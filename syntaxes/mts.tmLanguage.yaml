@@ -151,12 +151,13 @@ repository:
     - include: '#statement'
   macro-with-roll-options:
     name: meta.macro.roll-options.mts
-    match: '(?<=\[)([^:]+):(.+)(?=])'
+    match: '(?<=\[)([^:]+)(:)([^:]+)(?=])'
     captures:
       '1':
         patterns:
         - include: '#roll-options'
-      '2':
+      '2': { name: meta.macro.colon.mts }
+      '3':
         patterns:
         - include: '#statement'
   roll-options:

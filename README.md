@@ -26,6 +26,10 @@ This is very basic. So depending on your coding style it may not catch everythin
 
 ## Release Notes
 
+### 0.1.3
+
+* Fixed colon used for identifying library in macro roll-option breaks highlighting.
+
 ### 0.1.2
 
 * Fixed binary operators breaking quoted strings.
