@@ -1,6 +1,7 @@
 # Maptool VSCode Language Support
 
 Visual Studio Code extension for MapTool macro script language support.
+![Completion suggestions](images/Completion_Suggestions.gif)
 ![Sample](images/sample-script.png)
 
 ## Features
@@ -13,6 +14,11 @@ Basic syntax highlighting for MapTool script.
 * Separate scopes for built-in vs user-defined fuctions.
   * By default built-in functions are bold, but that can be customized by theme.
 * RPEdit formatting support.
+* Code-Completion suggestions
+
+* Hover with function signatures and error reporting
+
+![Hover example](images/Hover_with_error.png)
 
 ![Multi-part example](images/multi-part-macro.png)
 
@@ -25,6 +31,19 @@ None yet. :/
 This is very basic. So depending on your coding style it may not catch everything.
 
 ## Release Notes
+
+### 1.0.0-alpha1
+
+* REMOVED most TextMate based highlighting in favor of ANTLR4-based parsing.
+* ADDED Language server w/client
+  * Sematic tokens
+  * Tree visitor
+  * Variable usage before assignment waring.
+  * For-loop argument validation.
+  * Function and roll-option argument count validation
+  * Built-in function onHover information.
+  * Roll-option onHover information.
+  * Completion suggestions.
 
 ### 0.1.3
 

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
--
+- Complete overwite of text-mate parsing.
 
 ## [1.0.0]
 
@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Tree visitor
   - Variable usage before assignment waring.
   - For-loop argument validation.
+  - Function and roll-option argument count validation
+  - Built-in function onHover information.
+  - Roll-option onHover information.
+  - Completion suggestions.
 
 ### Deprecated
 
