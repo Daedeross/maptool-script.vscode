@@ -33,7 +33,7 @@ import {
 import { defaultTo, isNil, last, min, sortBy } from 'lodash';
 
 import { SymbolRefs, SymbolType } from './function_data';
-import { constructFunctionHover, getFunctionAtPosition, getWord, parametersToSignature, symbolToCompletionItemKind } from './utils';
+import { constructFunctionHover, constructRollOptionHover, getSymbolAtPosition, getWord, parametersToSignature, symbolToCompletionItemKind } from './utils';
 import { defaultSettings, WorkspaceManager } from './workspace_manager';
 import { MtsSettings } from './mts_settings';
 
@@ -119,25 +119,44 @@ connection.onHover((params) => {
         return;
     }
 
-    const f_ref = getFunctionAtPosition(script.symbols, params.position);
-    if (isNil(f_ref)) {
+    const s_ref = getSymbolAtPosition(script.symbols, params.position);
+    if (isNil(s_ref)) {
         return;
     }
 
-    const f_def = WorkspaceManager.BuiltInFunctions.get(f_ref.all.name);
-    if (isNil(f_def)) {
-        return {
-            contents: {
-                kind: MarkupKind.PlainText,
-                value: `${f_ref.all.name}`
-            },
-            range: f_ref.range
-        };
-    } else {
-        return {
-            contents: constructFunctionHover(globalSettings.wikiUriRoot, f_def),
-            range: f_ref.range
-        };
+    if (s_ref.all.type == SymbolType.function) {
+
+        const f_def = WorkspaceManager.BuiltInFunctions.get(s_ref.all.name);
+        if (isNil(f_def)) {
+            return {
+                contents: {
+                    kind: MarkupKind.PlainText,
+                    value: `${s_ref.all.name}`
+                },
+                range: s_ref.range
+            };
+        } else {
+            return {
+                contents: constructFunctionHover(globalSettings.wikiUriRoot, f_def),
+                range: s_ref.range
+            };
+        }
+    } else if (s_ref.all.type == SymbolType.rollOption) {
+        const ro_def = WorkspaceManager.RollOptions.get(s_ref.all.name);
+        if (isNil(ro_def)) {
+            return {
+                contents: {
+                    kind: MarkupKind.PlainText,
+                    value: `${s_ref.all.name}`
+                },
+                range: s_ref.range
+            };
+        } else {
+            return {
+                contents: constructRollOptionHover(globalSettings.wikiUriRoot, ro_def),
+                range: s_ref.range
+            };
+        }
     }
 });
 

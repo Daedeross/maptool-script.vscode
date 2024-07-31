@@ -1,5 +1,5 @@
 import { Diagnostic, DiagnosticSeverity, Position, Range, SemanticTokensBuilder, SemanticTokensLegend } from "vscode-languageserver";
-import { defaultTo, get, isNil, lowerCase } from "lodash";
+import { defaultTo, get, has, isNil, lowerCase } from "lodash";
 import { ParserRuleContext, Token } from "antlr4";
 
 import {
@@ -50,6 +50,7 @@ import {
 } from "./grammars/MTScriptParser";
 import MTScriptParserVisitor from "./grammars/MTScriptParserVisitor";
 import { extractDocumentation, IHaveRange, SymbolType } from "./function_data";
+import { WorkspaceManager } from "./workspace_manager";
 
 export enum TokenType {
     string = 0,
@@ -110,6 +111,13 @@ const toRange = (ctx: ParserRuleContext): Range => {
     }
 }
 
+const tokenToRange = (token: Token): Range => {
+    return {
+        start: { line: token.line - 1, character: token.column },
+        end: { line: token.line - 1, character: token.column + token.text.length  }
+    }
+}
+
 export interface VariableUsage {
     sets: Array<number>;
     gets: Array<{ position: number, length: number }>;
@@ -138,6 +146,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         super();
         // macro.args is always set, either by the calling macro or defaults to string.empty
         AddSet(this.vars, "macro.args", -1);
+        AddSet(this.vars, "roll.count", -1);
     }
 
     getTokens = () => this.builder.build();
@@ -191,6 +200,11 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         // visit any options before the 'switch'
         ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_SWITCH().symbol, TokenType.keyword);
+        this.symbols.push({
+            name: 'switch',
+            type: SymbolType.rollOption,
+            range: tokenToRange(ctx.KEYWORD_SWITCH().symbol)
+        });
         this.visit(ctx.expression());
         // visit options afer the switch
         ctx._second?.accept(this);
@@ -202,9 +216,11 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     visitSwitchCode = (ctx: SwitchCodeContext) => {
         ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_SWITCH().symbol, TokenType.keyword);
+        this.pushRollOption(ctx.KEYWORD_SWITCH().symbol);
         this.visit(ctx.expression());
 
         pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
+        this.pushRollOption(ctx.KEYWORD_CODE().symbol);
         pushToken(this.builder, ctx.COLON().symbol, TokenType.operator);
 
         this.visit(ctx.switchCodeBody());
@@ -213,6 +229,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     visitIfThen = (ctx: IfThenContext) => {
         ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_IF().symbol, TokenType.keyword);
+        this.pushRollOption(ctx.KEYWORD_IF().symbol);
         this.visit(ctx.expression());
         ctx._second?.accept(this);
         pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
@@ -224,10 +241,12 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     visitIfThenCode = (ctx: IfThenCodeContext) => {
         ctx._first?.accept(this);
         pushToken(this.builder, ctx.KEYWORD_IF().symbol, TokenType.keyword);
+        this.pushRollOption(ctx.KEYWORD_IF().symbol);
         this.visit(ctx.expression());
         ctx._second?.accept(this);
         pushToken(this.builder, ctx.COLON().symbol, TokenType.colon);
         pushToken(this.builder, ctx.KEYWORD_CODE().symbol, TokenType.keyword);
+        this.pushRollOption(ctx.KEYWORD_CODE().symbol);
         ctx._true_.accept(this);
         pushToken(this.builder, ctx.SEMI().symbol, TokenType.colon);
         ctx._false_.accept(this);
@@ -284,8 +303,25 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
             if (isNil(function_option)) {
                 this.visit(ctx.for_option());
             } else {
-                this.visit(ctx.function_option());
-                this.visit(ctx.argList());
+                const context = ctx.function_option();
+                this.visit(context);
+                const argCount = this.visitAndCountArgList(ctx.argList());
+                const ro = WorkspaceManager.RollOptions.get(context.getText());
+                if (!isNil(ro)) {
+                    if (argCount < ro.argMin) {
+                        this.diagnostics.push({
+                            range: toRange(context),
+                            severity: DiagnosticSeverity.Error,
+                            message: `Roll-Option '${ro.name}' requires at least ${ro.argMin} arguments.`
+                        });
+                    } else if (argCount > ro.argMax) {
+                        this.diagnostics.push({
+                            range: toRange(context),
+                            severity: DiagnosticSeverity.Error,
+                            message: `Roll-Option '${ro.name}' requires at most ${ro.argMax} arguments.`
+                        });
+                    }
+                }
             }
         } else {
             this.visit(simple);
@@ -298,6 +334,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         const col = ctx.start.column;
         const length = text.length;
         this.builder.push(line, col, length, TokenType.keyword, 0);
+        this.pushRollOption(ctx);
     }
 
     visitFunction_option = (ctx: Function_optionContext) => {
@@ -306,10 +343,12 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         const col = ctx.start.column;
         const length = text.length;
         this.builder.push(line, col, length, TokenType.keyword, 0);
+        this.pushRollOption(ctx);
     }
 
     visitFor_option = (ctx: For_optionContext) => {
         pushToken(this.builder, ctx._for_, TokenType.keyword);
+        this.pushRollOption(ctx._for_);
 
         let args = ctx.expression_list();
         let argCount = args.length;
@@ -527,5 +566,23 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
 
         this.builder.push(line, col, text.length, TokenType.variable, 0);
         // TODO: Add symbol
+    }
+
+    private pushRollOption = (input: Token | ParserRuleContext) => {
+        if (has(input, "line")) {
+            const token = input as Token;
+            this.symbols.push({
+                name: token.text.toLowerCase(),
+                type: SymbolType.rollOption,
+                range: tokenToRange(token)
+            });
+        } else {
+            const ctx = input as ParserRuleContext;
+            this.symbols.push({
+                name: ctx.getText().toLowerCase(),
+                type: SymbolType.rollOption,
+                range: toRange(ctx)
+            });
+        }
     }
 };

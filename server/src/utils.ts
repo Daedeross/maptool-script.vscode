@@ -5,13 +5,13 @@ import { isEmpty, isNil, last, sortedLastIndexBy } from "lodash";
 import { CharStream, CommonTokenStream } from 'antlr4';
 import MTScript2Lexer from './grammars/MTScriptLexer';
 import MTScript2Parser from './grammars/MTScriptParser';
-import { FunctionDefinition, FunctionUsage, DocumentSymbolRef, SymbolRefs, SymbolType } from "./function_data";
+import { FunctionDefinition, FunctionUsage, DocumentSymbolRef, SymbolRefs, SymbolType, RollOptionDefinition } from "./function_data";
 
 export const MTS = 'mts';  // languageId
 
 export const positionIteree = (pos: Position) => pos.line * 1000 + pos.character;
 
-export const getFunctionAtPosition = (symbols: Array<DocumentSymbolRef>, position: Position): DocumentSymbolRef | undefined => {
+export const getSymbolAtPosition = (symbols: Array<DocumentSymbolRef>, position: Position): DocumentSymbolRef | undefined => {
     const dummy: DocumentSymbolRef = {
         all: {
             name: '',
@@ -51,6 +51,10 @@ export const parametersToSignature = (usage: FunctionUsage | undefined | null): 
     return usageString;
 }
 
+export const codeBlock = (text: string, language: string) => {
+    return "```" + `${language}\n${text}` + "\n```";
+}
+
 export const constructFunctionHover = (wikiRoot: string, f_def: FunctionDefinition): MarkupContent => {
     const usage = last(f_def.usages);
     let usageString = '( ';
@@ -70,7 +74,38 @@ export const constructFunctionHover = (wikiRoot: string, f_def: FunctionDefiniti
     const wiki = isNil(f_def.wiki)
         ? ''
         : `\n\nWiki: [${f_def.name}](${wikiRoot}${f_def.wiki})`;
-    const value = `#### **${f_def.name}**${usageString}\n\n${f_def.description}${paramString}${wiki}`
+    const value = codeBlock(`${f_def.name}${usageString}`, 'c') + `\n\n${f_def.description}${paramString}${wiki}`;
+
+    return {
+        kind: MarkupKind.Markdown,
+        value
+    };
+}
+
+export const constructRollOptionHover = (wikiRoot: string, ro_def: RollOptionDefinition): MarkupContent => {
+    const wiki = isNil(ro_def.wiki)
+        ? ''
+        : `\n\nWiki: [${ro_def.name}](${wikiRoot}${ro_def.wiki})`;
+
+    if (isNil(ro_def.parameters)) {
+        return {
+            kind: MarkupKind.Markdown,
+            value: `[**${ro_def.name}**: ]\n\n${ro_def.description}${wiki}`
+        }
+    }
+
+    let usageString = '( ';
+    let paramString = ''
+    for (let var_name in ro_def.parameters) {
+        var param = ro_def.parameters[var_name];
+        usageString += `${var_name}, `;
+        paramString += `\n\n**${var_name}** \`${param.type}\` — ${param.description}`;
+    }
+    usageString = usageString.replace(/, $/, '');
+    usageString += ' )';
+
+
+    const value = `[**${ro_def.name}**${usageString}: ]\n\n${ro_def.description}${paramString}${wiki}`
 
     return {
         kind: MarkupKind.Markdown,

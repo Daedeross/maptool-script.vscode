@@ -8,7 +8,7 @@ import { InlineCompletionFeatureShape } from "vscode-languageserver/lib/common/i
 import { MtsSettings } from "./mts_settings";
 import { addOrUpdate, getParseTree, MTS, positionIteree } from "./utils";
 import { FoundSymbol, MTScriptLegend, MTScriptVisitor, VariableUsage } from "./visitor";
-import { FunctionDefinition, loadBuiltInFunctions, DocumentSymbolRef, SymbolRefs, SymbolType, DocumentFunctionRef, getArgCounts } from "./function_data";
+import { FunctionDefinition, loadBuiltInFunctions, DocumentSymbolRef, SymbolRefs, SymbolType, DocumentFunctionRef, getArgCounts, loadRollOptions } from "./function_data";
 
 export interface MtsDocument {
     // uri that points to TextDoccument instance
@@ -80,6 +80,7 @@ function updateSymbols(map: Map<string, SymbolRefs>,
 export class WorkspaceManager {
     // map of all? built-in MapToolScript functions
     static BuiltInFunctions = loadBuiltInFunctions();
+    static RollOptions = loadRollOptions();
 
     private readonly connection: ConnectionType;
 

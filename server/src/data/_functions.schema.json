@@ -28,39 +28,116 @@
                 "items": {
                     "type": "object",
                     "properties": {
-                        "parameters" : {
-                            "type": [ "object" ],
-                            "additionalProperties":
-                            {
-                                "type": [ "object", "boolean" ],
+                        "parameters": {
+                            "type": [
+                                "object"
+                            ],
+                            "additionalProperties": {
+                                "type": [
+                                    "object",
+                                    "boolean"
+                                ],
                                 "properties": {
                                     "type": {
                                         "oneOf": [
                                             {
                                                 "type": "string",
-                                                "enum": [ "number", "string", "string List", "string Property List", "JSON Array", "JSON Object" ]
+                                                "enum": [
+                                                    "number",
+                                                    "string",
+                                                    "string List",
+                                                    "string Property List",
+                                                    "JSON Array",
+                                                    "JSON Object"
+                                                ]
                                             },
                                             {
                                                 "type": "array",
                                                 "items": {
-                                                    "enum": [ "number", "string", "string List", "string Property List", "JSON Array", "JSON Object" ]
+                                                    "enum": [
+                                                        "number",
+                                                        "string",
+                                                        "string List",
+                                                        "string Property List",
+                                                        "JSON Array",
+                                                        "JSON Object"
+                                                    ]
                                                 }
                                             }
                                         ]
                                     },
                                     "default": {
-                                        "type": [ "boolean", "string", "number" ]
+                                        "type": [
+                                            "boolean",
+                                            "string",
+                                            "number"
+                                        ]
                                     },
                                     "description": {
-                                        "type" : "string"
+                                        "type": "string"
                                     },
-                                    "isParamArray" : {
+                                    "isParamArray": {
                                         "type": "boolean"
                                     }
                                 }
                             }
                         },
-                        "isTrusted" : {
+                        "isTrusted": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "parameters": {
+                "type": [
+                    "object"
+                ],
+                "additionalProperties": {
+                    "type": [
+                        "object",
+                        "boolean"
+                    ],
+                    "properties": {
+                        "type": {
+                            "oneOf": [
+                                {
+                                    "type": "string",
+                                    "enum": [
+                                        "number",
+                                        "string",
+                                        "string List",
+                                        "string Property List",
+                                        "JSON Array",
+                                        "JSON Object",
+                                        "variable"
+                                    ]
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "enum": [
+                                            "number",
+                                            "string",
+                                            "string List",
+                                            "string Property List",
+                                            "JSON Array",
+                                            "JSON Object"
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "default": {
+                            "type": [
+                                "boolean",
+                                "string",
+                                "number"
+                            ]
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "isParamArray": {
                             "type": "boolean"
                         }
                     }
@@ -76,6 +153,8 @@
                 "type": "string"
             }
         },
-        "required": [ "name", "usages" ]
+        "required": [
+            "name"
+        ]
     }
 }
