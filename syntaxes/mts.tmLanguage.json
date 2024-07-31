@@ -7,6 +7,9 @@
     "uuid": "44e8b0bb-5bab-47c6-bc66-e2bd33e1a0b7",
     "patterns": [
         {
+            "include": "#html-comment"
+        },
+        {
             "include": "#rpedit"
         },
         {
@@ -17,6 +20,11 @@
         }
     ],
     "repository": {
+        "html-comment": {
+            "name": "comment.block.mts",
+            "begin": "<!--",
+            "end": "-->"
+        },
         "html": {
             "name": "meta.embedded.html.mts",
             "match": "([^\\[]*)",
@@ -34,17 +42,8 @@
             }
         },
         "macro": {
-            "patterns": [
-                {
-                    "include": "#one-line-macro"
-                },
-                {
-                    "include": "#multi-line-macro-code"
-                },
-                {
-                    "include": "#multi-line-macro"
-                }
-            ]
+            "match": ".+",
+            "name": "meta.macro.mts"
         },
         "one-line-macro": {
             "name": "meta.macro.single.mts",

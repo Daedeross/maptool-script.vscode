@@ -32,10 +32,9 @@ import {
 
 import { defaultTo, isNil, last, min, sortBy } from 'lodash';
 
-import { MTScriptVisitor } from './visitor';
-import { resetSymbols, SymbolRefs, SymbolType } from './function_data';
+import { SymbolRefs, SymbolType } from './function_data';
 import { constructFunctionHover, getFunctionAtPosition, getWord, parametersToSignature, symbolToCompletionItemKind } from './utils';
-import { defaultSettings, MtsDocument, WorkspaceManager } from './workspace_manager';
+import { defaultSettings, WorkspaceManager } from './workspace_manager';
 import { MtsSettings } from './mts_settings';
 
 // Create a connection for the server, using Node's IPC as a transport.
@@ -241,7 +240,7 @@ function symbolToCompletionItem(x: SymbolRefs, word: Range): CompletionItem {
 
     if (x.type == SymbolType.function) {
         const f_def = WorkspaceManager.BuiltInFunctions.get(x.name);
-        if(!isNil(f_def?.usages)) {
+        if (!isNil(f_def?.usages)) {
             item.labelDetails = {
                 detail: ' ' + parametersToSignature(last(f_def.usages))
             }
@@ -275,7 +274,7 @@ connection.onCompletion(
                 };
                 const results = manager.symbolsTrie.search(word);
                 if (results.length > 0) {
-                    return results.map( x => symbolToCompletionItem(x, range));
+                    return results.map(x => symbolToCompletionItem(x, range));
                 }
             }
 
@@ -302,7 +301,7 @@ connection.onCompletionResolve(
             item.textEdit = TextEdit.replace(item.data, `${item.label}()`);
             item.command = moveCursorCommand;
         }
-        
+
         return item;
     }
 );

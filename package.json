@@ -107,7 +107,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
+    "vscode:prepublish": "npm install && npm run package",
     "parseyaml": "python build-grammar.py syntaxes/mts.tmLanguage.yaml syntaxes/mts.tmLanguage.json",
     "webpack": "webpack --mode development",
     "webpack-dev": "webpack --mode development --watch",

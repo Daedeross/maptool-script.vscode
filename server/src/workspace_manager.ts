@@ -1,4 +1,4 @@
-import { defaultTo, get, groupBy, isEqual, isNil, min, sortBy } from "lodash";
+import { defaultTo, get, groupBy, includes, isEqual, isNil, min, minBy, sortBy } from "lodash";
 import TrieSearch from "trie-search";
 
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -8,7 +8,7 @@ import { InlineCompletionFeatureShape } from "vscode-languageserver/lib/common/i
 import { MtsSettings } from "./mts_settings";
 import { addOrUpdate, getParseTree, MTS, positionIteree } from "./utils";
 import { FoundSymbol, MTScriptLegend, MTScriptVisitor, VariableUsage } from "./visitor";
-import { FunctionDefinition, loadBuiltInFunctions, resetSymbols, DocumentSymbolRef, SymbolRefs, SymbolType } from "./function_data";
+import { FunctionDefinition, loadBuiltInFunctions, DocumentSymbolRef, SymbolRefs, SymbolType, DocumentFunctionRef, getArgCounts } from "./function_data";
 
 export interface MtsDocument {
     // uri that points to TextDoccument instance
@@ -43,36 +43,38 @@ function updateSymbols(map: Map<string, SymbolRefs>,
 
     return sortBy(
         incomming.map(x => {
-        const refs = addOrUpdate(
-            map,
-            x.name,
-            k => {
-                return {
-                    name: x.name,
-                    type: x.type,
-                    builtin: false,
-                    locations: [{
+            const refs = addOrUpdate(
+                map,
+                x.name,
+                k => {
+                    return {
+                        name: x.name,
+                        type: x.type,
+                        builtin: false,
+                        locations: [{
+                            range: x.range,
+                            uri
+                        }]
+                    };
+                },
+                (k, v) => {
+                    v.locations.push({
                         range: x.range,
                         uri
-                    }]
-                };
-            },
-            (k, v) => {
-                v.locations.push({
-                    range: x.range,
-                    uri
+                    });
+                    v.locations = sortBy(v.locations, x => x.uri, x => positionIteree(x.range.start));
+                    return v;
                 });
-                v.locations = sortBy(v.locations, x => x.uri, x => positionIteree(x.range.start));
-                return v;
-            });
 
-        return {
-            range: x.range,
-            all: refs
-        };
-    }),
-    x => x.range.start.line,
-    x => x.range.start.character);
+            return {
+                range: x.range,
+                all: refs,
+                argCount: x.argCount
+            };
+        }),
+        x => x.range.start.line,
+        x => x.range.start.character
+    );
 }
 
 export class WorkspaceManager {
@@ -85,6 +87,7 @@ export class WorkspaceManager {
     public mtScripts: Map<string, MtsDocument> = new Map<string, MtsDocument>();
     public allSymbols = new Map<string, SymbolRefs>();
     public symbolsTrie = new TrieSearch<SymbolRefs>('name');
+    public udfs = new Map<string, Set<string>>();
     // Cache the settings of all open documents
     public documentSettings: Map<string, Thenable<MtsSettings>> = new Map();
 
@@ -211,16 +214,19 @@ export class WorkspaceManager {
         // sort functions by start position
         const foundSymbols = sortBy(visitor.getSymbols(), f => positionIteree(f.range.start));
         const semanticTokens = visitor.getTokens();
+        const defines = new Set(visitor.defines);
+        this.updateUDFs(uri, defines);
 
         const symbols = updateSymbols(this.allSymbols, uri, oldSymbols, foundSymbols);
+        const functionProblems = this.diagnoseFunctions(symbols);
         this.recalcTrie();
 
         return {
             uri: uri,
             symbols: symbols,
             vars: visitor.vars,
-            diagnostics: visitor.diagnostics,
-            tokens: semanticTokens
+            diagnostics: visitor.diagnostics.concat(functionProblems),
+            tokens: semanticTokens,
         }
     }
 
@@ -273,4 +279,81 @@ export class WorkspaceManager {
                     this.symbolsTrie.add(refs);
                 })
         }
+
+    private updateUDFs = (uri: string, defines: Set<string>) => {
+        const toRemove: Array<string> = [];
+        for (let [name, uris] of this.udfs) {
+            if (defines.has(name)) {
+                defines.delete(name);  // remove from set, so not re-added later
+                if (uris.has(uri)) {
+                    continue;
+                } else {
+                    uris.add(uri);
+                }
+            } else if (uris.has(uri)) {
+                uris.delete(uri);
+                if (uris.size == 0) {
+                    toRemove.push(name);
+                }
+            }
+        }
+
+        for (let name in toRemove) {
+            this.udfs.delete(name);
+        }
+
+        for (let name in defines) {
+            addOrUpdate(
+                this.udfs,
+                name,
+                (k) => {
+                    return new Set<string>([uri]);
+                },
+                (k, v) => {
+                    v.add(uri);
+                    return v;
+                }
+            );
+        }
+    }
+
+    private diagnoseFunctions = (symbols: Array<DocumentSymbolRef | DocumentFunctionRef>): Diagnostic[] => {
+        const diagnostics: Array<Diagnostic> = [];
+        for (let symbol of symbols) {
+            const diagnostic = this.diagnoseFunction(symbol);
+            if (!isNil(diagnostic)) {
+                diagnostics.push(diagnostic);
+            }
+        }
+
+        return diagnostics;
+    }
+
+    private diagnoseFunction = (ref: DocumentSymbolRef | DocumentFunctionRef): undefined | Diagnostic => {
+        const argCount = get(ref, 'argCount');
+        if (isNil(argCount)) {
+            return;
+        }
+
+        const builtIn = WorkspaceManager.BuiltInFunctions.get(ref.all.name)
+        if (isNil(builtIn)) {
+            return;
+        }
+
+        const requiredCounts = getArgCounts(builtIn);
+
+        if (argCount < requiredCounts[0]) {
+            return {
+                range: ref.range,
+                severity: DiagnosticSeverity.Error,
+                message: `Built-in function '${builtIn.name}' requires at least ${requiredCounts[0]} arguments.`
+            }
+        } else if (argCount > requiredCounts[1]) {
+            return {
+                range: ref.range,
+                severity: DiagnosticSeverity.Error,
+                message: `Built-in Function '${builtIn.name}' requires at most ${requiredCounts[1]} arguments.`
+            }
+        }
+    }
 }

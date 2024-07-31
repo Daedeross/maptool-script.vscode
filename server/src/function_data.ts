@@ -1,4 +1,4 @@
-import { isEmpty, isNil } from 'lodash';
+import { defaultTo, get, isEmpty, isNil, min } from 'lodash';
 import * as builtin_functions from './data/functions.mts.json';
 import { Range } from 'vscode-languageserver';
 import TrieSearch from 'trie-search';
@@ -26,6 +26,10 @@ export interface DocumentSymbolRef extends IHaveRange {
     all: SymbolRefs;
 }
 
+export interface DocumentFunctionRef extends DocumentSymbolRef {
+    argCount: number;
+}
+
 // Represents all references in the workspace for a symbol.
 export interface SymbolRefs {
     name: string;
@@ -36,6 +40,7 @@ export interface SymbolRefs {
 
 export interface FunctionParameter {
     type: string;
+    default?: string;
     description?: string;
     isParamArray?: boolean;
 }
@@ -55,6 +60,17 @@ export interface FunctionDefinition {
     notes?: string,
     wiki?: string;
 };
+
+export interface InlineFunctionDefinition {
+    name?: string;
+    aliases?: Array<string>;
+    description?: string;
+    isTrusted?: boolean;
+    usages?: Array<FunctionUsage>;
+    returns?: string;
+    notes?: string,
+    wiki?: string;
+}
 
 export interface AllSymbols {
     byName: Map<string, SymbolRefs>;
@@ -85,35 +101,46 @@ export const loadBuiltInFunctions = (): Map<string, FunctionDefinition> => {
     return all_functions;
 }
 
-// export const addSymbols =
-//     (allSymbols: AllSymbols, symbols: Array<DocumentSymbolRef>, uri: string) => {
-//         for (let s_ref of symbols) {
-//             addOrUpdate(
-//                 allSymbols.byName,
-//                 s_ref.name,
-//                 _ => {
-//                     const newRef = {
-//                         name: s_ref.name,
-//                         type: s_ref.type,
-//                         builtin: false,
-//                         locations: [{
-//                             range: s_ref.range,
-//                             uri
-//                         }]
-//                     };
-//                     allSymbols.trie.add(newRef);
+const jsonRE = /\{.*\}/m;
 
-//                     return newRef;
-//                 },
-//                 (k, v) => {
-//                     v.locations.push({ range: s_ref.range, uri })
-//                     return v;
-//                 }
-//             );
-//         }
-//     }
+export const extractDocumentation = (text: string): InlineFunctionDefinition | undefined => {
+    const match = text.match(jsonRE);
+    if (isNil(match)) {
+        return;
+    }
+    try {
+        return JSON.parse(match[0]) as InlineFunctionDefinition;
+    }
+    catch {
+        return;
+    }
+}
 
-export const resetSymbols = (allSymbols: AllSymbols) => {
-    allSymbols.trie.reset();
-    allSymbols.trie.addAll(Array.from(allSymbols.byName.values()));
+export const getArgCounts = (def: InlineFunctionDefinition | FunctionDefinition) => {
+    if (isNil(def.usages)) {
+        return [0, 0];
+    }
+
+    let min = Number.MAX_SAFE_INTEGER;
+    let max = 0;
+    for (let usage of def.usages) {
+        if (isNil(usage.parameters)) {
+            min = 0;
+            continue;
+        }
+
+        let localMin = 0;
+        let localMax = 0;
+        for (let name in usage.parameters) {
+            localMax++;
+            if (!usage.parameters[name].default) {
+                localMin++
+            }
+        }
+
+        min = Math.min(min, localMin);
+        max = Math.max(max, localMax);
+    }
+
+    return [min, max]
 }

@@ -991,7 +991,7 @@
                         "description": "The label for the macro button."
                     },
                     "command": {
-                        "type": "strict",
+                        "type": "string",
                         "description": "The command to run when the macro button is clicked, or the macro is called."
                     }
                 }
@@ -1003,7 +1003,7 @@
                         "description": "The label for the macro button."
                     },
                     "command": {
-                        "type": "strict",
+                        "type": "string",
                         "description": "The command to run when the macro button is clicked, or the macro is called."
                     },
                     "props": {
@@ -1022,7 +1022,7 @@
                         "description": "The label for the macro button."
                     },
                     "command": {
-                        "type": "strict",
+                        "type": "string",
                         "description": "The command to run when the macro button is clicked, or the macro is called."
                     },
                     "props": {
@@ -1045,7 +1045,7 @@
                         "description": "The label for the macro button."
                     },
                     "command": {
-                        "type": "strict",
+                        "type": "string",
                         "description": "The command to run when the macro button is clicked, or the macro is called."
                     },
                     "props": {
@@ -1073,7 +1073,7 @@
                         "description": "The label for the macro button."
                     },
                     "command": {
-                        "type": "strict",
+                        "type": "string",
                         "description": "The command to run when the macro button is clicked, or the macro is called."
                     },
                     "props": {
@@ -1115,7 +1115,7 @@
                         "description": "She name of the new map."
                     },
                     "config": {
-                        "type": "JSON object",
+                        "type": "JSON Object",
                         "description": "Configuration for the new map."
                     }
                 }
@@ -1558,7 +1558,7 @@
             {
                 "parameters": {
                     "props": {
-                        "type": "String property list",
+                        "type": "string Property List",
                         "description": "The input property list."
                     },
                     "key": {
@@ -1797,165 +1797,636 @@
         "wiki": "/dropHighest"
     },
     {
-        "name": "",
+        "name": "editStream",
         "aliases": [],
-        "description": "",
+        "description": "Edit an audio stream currently playing.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "uri": {
+                        "type": "string",
+                        "description": "The uri/url of the stream to edit. If set to '*', all audio streams are edited."
+                    },
+                    "cycleCount": {
+                        "type": ["number", "string"],
+                        "description": "The number of times the audio should play. If set to 0, the file is cached but not played; if set to -1, the file is played continuously. If set to a blank string '', the property is not changed. Defaults to ''.",
+                        "default": ""
+                    },
+                    "volume": {
+                        "type":  ["number", "string"],
+                        "description": " The volume the audio is to be played at. Can range from 0 to 1. If set to '', the property is not changed. Defaults to ''.",
+                        "default": ""
+                    },
+                    "start": {
+                        "type": ["number", "string"],
+                        "description": "The time offset in seconds where audio should start playing, or restart from when repeating. If set to '', the property is not changed. Defaults to ''.",
+                        "default": ""
+                    },
+                    "stop": {
+                        "type":  ["number", "string"],
+                        "description": "The time offset where audio should stop playing or restart when repeating. If set to '', the property is not changed. Defaults to ''",
+                        "default": ""
                     }
                 }
             }
         ],
-        "returns": "",
+        "wiki": "/editStream"
+    },
+    {
+        "name": "encode",
+        "aliases": [],
+        "description": "Encodes a string that was can be decoded with the `decode()` function.",
+        "usages": [
+            {
+                "parameters": {
+                    "str": {
+                        "type": "string",
+                        "description": "The string to encode."
+                    }
+                }
+            }
+        ],
+        "returns": "The encoded string.",
+        "notes": "The `decode()` and `encode()` functions can be used to encode a property list so that it can be embedded within another property list.",
+        "wiki": "/encode"
+    },
+    {
+        "name": "endsWith",
+        "aliases": [],
+        "description": "Returns 1 if the string ends with a certain sub string.",
+        "usages": [
+            {
+                "parameters": {
+                    "str": {
+                        "type": "string",
+                        "description": "In string to check the end of."
+                    },
+                    "substr": {
+                        "type": "string",
+                        "description": "The sub-string to test the end of `str` for."
+                    }
+                }
+            }
+        ],
+        "returns": "True (1) if the end of the string `str` matches the string `substr`, otherwise false (0).",
         "notes": "",
+        "wiki": "/endsWith"
+    },
+    {
+        "name": "equals",
+        "aliases": [ "eq" ],
+        "description": "This functions checks for equality between all of the passed in values.",
+        "usages": [
+            {
+                "parameters": {
+                    "args": {
+                        "type": [ "string", "number" ],
+                        "description": "The strings or numbers to compare.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "True (1) if the strings or numbers are equivalent. Mixed strings and numbers always return false (0).",
+        "notes": "You can use it for string (case-insensitive) or numeric comparisons but not both at the same time.",
+        "wiki": "/equals"
+    },
+    {
+        "name": "equalsStrict",
+        "aliases": [ "eqs" ],
+        "description": "This function checks for equality between all of the passed in values. Unlike `equals()` this function can only be used for string values and is case-sensitive.",
+        "usages": [
+            {
+                "parameters": {
+                    "strings": {
+                        "type": "string",
+                        "description": "The strings to compare.",
+                        "isParamArray": true
+                    }
+                }
+            }
+        ],
+        "returns": "True (1) if all strings are exactly equal (case-sensitive).",
+        "wiki": "/equalsStrict"
+    },
+    {
+        "name": "eraseCoverVBL",
+        "aliases": [],
+        "description": "Erases Cover Vision Blocking Layer (Cover VBL) shapes from the Map VBL.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "An array of one or more shapes as JSON objects."
+                    }
+                }
+            }
+        ],
+        "notes": "This function does not affect Token VBL. See the wiki for details on defining `shapeArray`.",
+        "wiki": "/eraseCoverVBL"
+    },
+    {
+        "name": "eraseHillVBL",
+        "aliases": [],
+        "description": "Erases Hill Vision Blocking Layer (Hill VBL) shapes from the Map VBL.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "An array of one or more shapes as JSON objects."
+                    }
+                }
+            }
+        ],
+        "notes": "This function does not affect Token VBL. See the wiki for details on defining `shapeArray`.",
+        "wiki": "/eraseHillVBL"
+    },
+    {
+        "name": "eraseMBL",
+        "aliases": [],
+        "description": "Erases Movement Blocking Layer (MBL) shapes from the Map MBL.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "An array of one or more shapes as JSON objects."
+                    }
+                }
+            }
+        ],
+        "notes": "This function does not affect Token MBL. See the wiki for details on defining `shapeArray`.",
+        "wiki": "/eraseMBL"
+    },
+    {
+        "name": "erasePitVBL",
+        "aliases": [],
+        "description": "Erases Pit Vision Blocking Layer (Pit VBL) shapes from the Map VBL.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "An array of one or more shapes as JSON objects."
+                    }
+                }
+            }
+        ],
+        "notes": "This function does not affect Token VBL. See the wiki for details on defining `shapeArray`.",
+        "wiki": "/erasePitVBL"
+    },
+    {
+        "name": "eraseVBL",
+        "aliases": [],
+        "description": "Erases Wall Vision Blocking Layer (Wall VBL) shapes from the Map VBL.",
+        "usages": [
+            {
+                "parameters": {
+                    "shapeArray": {
+                        "type": "JSON Array",
+                        "description": "An array of one or more shapes as JSON objects."
+                    }
+                }
+            }
+        ],
+        "notes": "This function does not affect Token VBL. See the wiki for details on defining `shapeArray`.",
+        "wiki": "/eraseVBL"
+    },
+    {
+        "name": "eval",
+        "aliases": [],
+        "description": "Evaluates an expression in a string and returns the result.",
+        "usages": [
+            {
+                "parameters": {
+                    "expr": {
+                        "type": "string",
+                        "description": "The expression to evaluate."
+                    }
+                }
+            }
+        ],
+        "returns": "The result of the expression.",
+        "notes": "The string contains the same type of expression that is usually located between macro brackets (e.g { } or [r: 2+2]).",
+        "wiki": "/eval"
+    },
+    {
+        "name": "evalMacro",
+        "aliases": [],
+        "description": "Evaluates and 'executes' the macro in a string and returns the result. Uses the *current* scope.",
+        "usages": [
+            {
+                "parameters": {
+                    "macroString": {
+                        "type": "string",
+                        "description": "The macro script that is evaluated."
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "returns": "The output of the evaluated macro.",
+        "notes": "The string contains the same type of macro commands that you would put in a token macro with the exception that it can not contain slash commands.",
+        "wiki": "/evalMacro"
+    },
+    {
+        "name": "execMacro",
+        "aliases": [],
+        "description": "Evaluates and 'executes' the macro in a string and returns the result. Uses a *new* scope.",
+        "usages": [
+            {
+                "parameters": {
+                    "macroString": {
+                        "type": "string",
+                        "description": "The macro script that is executed."
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "returns": "The output of the executed macro.",
+        "notes": "The string contains the same type of macro commands that you would put in a token macro with the exception that it can not contain slash commands.",
+        "wiki": "/evalMacro"
+    },
+    {
+        "name": "execFunction",
+        "aliases": [],
+        "description": "Invokes a built-in macro function or user-defined function (UDF) on one or more clients.",
+        "usages": [
+            {
+                "parameters": {
+                    "functionName": {
+                        "type": "string",
+                        "description": "The function to invoke."
+                    },
+                    "arguments": {
+                        "type": "JSON Array",
+                        "description": "Arguments to supply the function."
+                    },
+                    "defer": {
+                        "type": "number",
+                        "description": "If true (1), invokes the function after the current macro has completed.",
+                        "default": 0
+                    },
+                    "targets": {
+                        "type": [ "string List", "JSON Array" ],
+                        "description": "The user names (so not token names) but the names of the users that are logged in. The options 'gm', 'gm-self', 'self', 'not-self', 'not-gm', 'not-gm-self', 'none', and 'all' are also valid",
+                        "default": "self"
+                    },
+                    "delim": {
+                        "type": "string List",
+                        "description": "The delimiter used to separate the values in the String List that is given, defaults to ','. If 'json' is specified, a JSON array is expected instead of a String List.",
+                        "default": ","
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "notes": "No output from the executed function will be presented on the targets.",
+        "wiki": "/execFunction"
+    },
+    {
+        "name": "explode",
+        "aliases": [],
+        "description": "Generates random numbers to emulate dice rolls; returns the total of a dice roll where dice that are rolled at maximum value are rolled again with the new roll added to the old.",
+        "usages": [
+            {
+                "parameters": {
+                    "times": {
+                        "type": "number",
+                        "description": "The number of dice to roll."
+                    },
+                    "sides": {
+                        "type": "number",
+                        "description": "The number of sides the dice possess."
+                    },
+                    "limit": {
+                        "type": "number",
+                        "description": "The maximum number of rerolls available for each die. Set to -1 for no limit.",
+                        "default": -1
+                    }
+                }
+            }
+        ],
+        "returns": "The result (sum) of the dice roll",
+        "wiki": "/explode"
+    },
+    {
+        "name": "explodingSuccess",
+        "aliases": [],
+        "description": "Generates random numbers to emulate dice rolls; any dice that are rolled at maximum value are rolled again with the new roll added to the old.",
+        "usages": [
+            {
+                "parameters": {
+                    "times": {
+                        "type": "number",
+                        "description": "The number of dice to roll."
+                    },
+                    "sides": {
+                        "type": "number",
+                        "description": "The number of sides the dice possess."
+                    },
+                    "target": {
+                        "type": "number",
+                        "description": "The number that a dice needs to be equal to or higher to be considered a success (added to the count returned).",
+                        "default": -1
+                    }
+                }
+            }
+        ],
+        "returns": "A string showing the result of each die and the total number of successes.",
+        "wiki": "/explodingSuccess"
+    },
+    {
+        "name": "exportData",
+        "aliases": [],
+        "description": "Allows the storage of string data into an external file.",
+        "usages": [
+            {
+                "parameters": {
+                    "pathname": {
+                        "type": "string",
+                        "description": "The path that data will be written to; this file will be created if it doesn't already exist."
+                    },
+                    "data": {
+                        "type": "string",
+                        "description": "The string written to the file."
+                    },
+                    "append": {
+                        "type": "number",
+                        "description": "If true (1), the data is appended to the end of the file if it exists, otherwise overwrites an existing contents."
+                    }
+                }
+            }
+        ],
+        "isTrusted": true,
+        "notes": "The Allow External Macro Access option in MapTool's Preferences must be enabled or this macro aborts with an error. ",
+        "wiki": "/exportData"
+    },
+    {
+        "name": "exposeAllOwnedArea",
+        "aliases": [ "exposeAllOwnedArea" ],
+        "description": "Exposes all area visible to tokens owned by the current player that have vision turned on in the token editor. ",
+        "usages": [
+            {
+                "parameters": {
+                    "mapName": {
+                        "type": "string",
+                        "description": "The name of an existing map within the campaign."
+                    }
+                }
+            }
+        ],
+        "notes": "The actual area exposed depends on server settings (like Individual Views) and various MapTool Preferences.",
         "wiki": "/"
     },
     {
-        "name": "",
+        "name": "exposeFogAtWaypoints",
         "aliases": [],
-        "description": "",
+        "description": "Returns a string (Enabled/Disabled) indicating whether the Expose Fog At Waypoints option is set in the MapTool Map menu.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
-                    }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "returns": "A string ('Enabled' or 'Disabled') indicating whether the Expose Fog At Waypoints option is set in the MapTool Map menu.",
+        "wiki": "/exposeFogAtWaypoints"
     },
     {
-        "name": "",
+        "name": "exposeFOW",
         "aliases": [],
-        "description": "",
+        "description": "Clears the Fog of War (FOW) for all selected tokens on the current map according to their sight settings.",
         "usages": [
             {
                 "parameters": {
+                    "mapname": {
+                        "type": "string",
+                        "description": "The name of the map to expose on.",
+                        "default": "Current Map"
+                    },
+                    "tokens": {
+                        "type": [ "string List", "JSON Array" ],
+                        "description": "Tokens to use instead of which are currently selected.",
+                        "default": true
+                    },
                     "_param": {
-                        "type": "",
-                        "description": ""
+                        "type": "string",
+                        "description": "The delimiter for the `tokens` list. Use 'json' for a JSON Array",
+                        "default": ","
                     }
                 }
             }
         ],
+        "isTrusted": true,
         "returns": "",
         "notes": "",
-        "wiki": "/"
+        "wiki": "/exposeFOW"
     },
     {
-        "name": "",
+        "name": "exposePCOnlyArea",
         "aliases": [],
-        "description": "",
+        "description": "Clears Fog of War (FOW) where PC tokens can see and establishes/restores FOW everywhere they cannot.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "mapname": {
+                        "type": "string",
+                        "description": "The name of the map to reveal on.",
+                        "default": "Current Map"
                     }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "notes": "This function is often used in combination with the onTokenMove event.",
+        "wiki": "/exposePCOnlyArea"
     },
     {
-        "name": "",
+        "name": "findDrawings",
         "aliases": [],
-        "description": "",
+        "description": "Returns the id or ids of any drawing on the specified map that matches the name parameter.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "mapName": {
+                        "type": "string",
+                        "description": "The name of the map to search."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "name of the searched for drawings. Pass '*' to get all drawings. Drawings can be named via the Draw Explorer interface or using setDrawingName()."
+                    },
+                    "delim": {
+                        "type": "string",
+                        "description": "Separator for the output. If 'json' is used, the output will be a JSON Array.",
+                        "default": ","
                     }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "returns": "The id or ids of any drawing on the specified map that matches the name parameter.",
+        "wiki": "/findDrawings"
     },
     {
-        "name": "",
+        "name": "findToken",
         "aliases": [],
-        "description": "",
+        "description": "Finds a token on the current map by the token name, GM name, or ID and returns its id.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the `id` or Token Name of the token."
+                    },
+                    "mapname": {
+                        "type": "string",
+                        "description": "Optional name of the map to search for the token on.",
+                        "default": "Current Map"
                     }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "isTrusted": true,
+        "returns": "The id of the found token or an empty string if no token is found. ",
+        "notes": "It is undefined what is returned if multiple tokens match the given `tokenRef`.",
+        "wiki": "/findToken"
     },
     {
-        "name": "",
+        "name": "flipTokenIso",
         "aliases": [],
-        "description": "",
+        "description": "Flip the current token image in the Isomeric plane like the right-click menu option.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of the token",
+                        "default": "Current Token"
+                    },
+                    "map": {
+                        "type": "string",
+                        "description": "Map the token is located on.",
+                        "default": "Current Map"
                     }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "isTrusted": true,
+        "returns": "New flipped status (0 or 1)",
+        "wiki": "/flipTokenIso"
     },
     {
-        "name": "",
+        "name": "flipTokenX",
         "aliases": [],
-        "description": "",
+        "description": "Flip the current token image horizontally like the right-click menu option.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of the token",
+                        "default": "Current Token"
+                    },
+                    "map": {
+                        "type": "string",
+                        "description": "Map the token is located on.",
+                        "default": "Current Map"
                     }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "isTrusted": true,
+        "returns": "0",
+        "wiki": "/flipTokenX"
     },
     {
-        "name": "",
+        "name": "flipTokenY",
         "aliases": [],
-        "description": "",
+        "description": "Flip the current token image vertically like the right-click menu option.",
         "usages": [
             {
                 "parameters": {
-                    "_param": {
-                        "type": "",
-                        "description": ""
+                    "tokenRef": {
+                        "type": "string",
+                        "description": "Either the token `id` or Token Name of the token",
+                        "default": "Current Token"
+                    },
+                    "map": {
+                        "type": "string",
+                        "description": "Map the token is located on.",
+                        "default": "Current Map"
                     }
                 }
             }
         ],
-        "returns": "",
-        "notes": "",
-        "wiki": "/"
+        "isTrusted": true,
+        "returns": "New flipped status (0 or 1)",
+        "wiki": "/flipTokenY"
+    },
+    {
+        "name": "floor",
+        "aliases": [],
+        "description": "Mathmatical floor operation.",
+        "usages": [
+            {
+                "parameters": {
+                    "num": {
+                        "type": "number",
+                        "description": "The number to floor."
+                    }
+                }
+            }
+        ],
+        "returns": "The closest integer not greater than `num`.",
+        "wiki": "/floor"
+    },
+    {
+        "name": "formatStrProp",
+        "aliases": [],
+        "description": "Returns a custom-formatted version of the property string.",
+        "usages": [
+            {
+                "parameters": {
+                    "props": {
+                        "type": "string Property List",
+                        "description": "The input list of key=value pairs."
+                    },
+                    "listFormat": {
+                        "type": "string",
+                        "description": "Emitted once. It should contain the text '%list', which is replaced with the formatted items."
+                    },
+                    "entryFormat": {
+                        "type": "string",
+                        "description": "Emitted once *per item*. Any instances of '%key' and '%value' in the string are replaced with the key or value for that setting."
+                    },
+                    "separator": {
+                        "type": "string",
+                        "description": "Emitted in between the formatted items."
+                    }
+                }
+            }
+        ],
+        "returns": "The fully formatted string.",
+        "wiki": "/formatStrProp"
+    },
+    {
+        "name": "fudge",
+        "aliases": [],
+        "description": "Generates random numbers to emulate FUDGE dice rolls; returns the total of a special Fudge dice roll.",
+        "usages": [
+            {
+                "parameters": {
+                    "times": {
+                        "type": "number",
+                        "description": "The number of dice to roll."
+                    }
+                }
+            }
+        ],
+        "returns": "The sum of the FUDGE rolls.",
+        "notes": "When these dice are rolled, the result is -1, 0, or 1, this function then sums up all of the dice rolled and returns that sum.",
+        "wiki": "/fudge"
     }
 ]

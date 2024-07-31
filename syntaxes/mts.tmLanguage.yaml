@@ -107,10 +107,15 @@ variables:
     |group|sortBy|label|maxWidth|minWidth|playerEditable|tooltip|compare)\\b"
 
 patterns:
+  - include: '#html-comment'
   - include: '#rpedit'
   - include: '#macro'
   - include: '#html'
 repository:
+  html-comment:
+    name: comment.block.mts
+    begin: '<!--'
+    end: '-->'
   html:
     name: meta.embedded.html.mts
     match: '([^\[]*)'
@@ -120,10 +125,12 @@ repository:
         - include: text.html
         - include: source.js
   macro:
-    patterns:
-    - include: '#one-line-macro'
-    - include: '#multi-line-macro-code'
-    - include: '#multi-line-macro'
+    match: '.+'
+    name: meta.macro.mts
+    # patterns:
+    # - include: '#one-line-macro'
+    # - include: '#multi-line-macro-code'
+    # - include: '#multi-line-macro'
   one-line-macro:
     name: meta.macro.single.mts
     match: '(\[.+])' # (?!.*")'

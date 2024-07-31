@@ -12,6 +12,7 @@ import {
     BlockContext,
     BooleanBinaryExpressionContext,
     BooleanUnaryExpressionContext,
+    CommentContext,
     ComparisonExpressionContext,
     ExpressionContext,
     For_optionContext,
@@ -48,7 +49,7 @@ import {
     VariableContext
 } from "./grammars/MTScriptParser";
 import MTScriptParserVisitor from "./grammars/MTScriptParserVisitor";
-import { IHaveRange, SymbolType } from "./function_data";
+import { extractDocumentation, IHaveRange, SymbolType } from "./function_data";
 
 export enum TokenType {
     string = 0,
@@ -65,6 +66,7 @@ export enum TokenType {
 export interface FoundSymbol extends IHaveRange {
     name: string;
     type: SymbolType;
+    argCount?: number
 }
 
 
@@ -130,6 +132,7 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
     private symbols: Array<FoundSymbol> = [];
     public vars = new Map<string, VariableUsage>();
     public diagnostics: Array<Diagnostic> = [];
+    public defines: Array<string> = [];
 
     constructor() {
         super();
@@ -152,7 +155,17 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         if (!isNil(macro)) {
             macro.accept(this);
         }
+        // else {
+        //     const comment = ctx.comment();
+        //     if (!isNil(comment)) {
+        //         comment.accept(this);
+        //     }
+        // }
     }
+
+    // visitComment = (ctx: CommentContext) => {
+    //     const text = ctx.commentText().getText();
+    // }
 
     // visitScript = (ctx: ScriptContext) => {
     //     console.log('ms' + ctx.start.line );
@@ -466,22 +479,46 @@ export class MTScriptVisitor extends MTScriptParserVisitor<void> {
         const col = ctx.start.column;
 
         this.builder.push(line, col, text.length, TokenType.function, 0);
+
+        const argCount = this.visitAndCountArgList(ctx.argList());
+
         this.symbols.push({
             name: text,
             type: SymbolType.function,
+            argCount: argCount,
             range: {
                 start: { line: line, character: col },
                 end: { line: line, character: col + text.length }   // line# is unchanged since identifiers cannot be broken by whitespace
             }
-        })
-
-        this.visit(ctx.argList());
+        });
     }
 
-    visitArgList = (ctx: ArgListContext) => {
-        ctx.expression_list()
-            .forEach(exp => this.visit(exp));
+    visitAndCountArgList = (ctx: ArgListContext): number => {
+        const args = ctx.expression_list();
+        args.forEach(exp => this.visit(exp));
+
+        return args.length;
     }
+
+    // visitArgList = (ctx: ArgListContext) => {
+    //     ctx.expression_list()
+    //         .forEach(exp => this.visit(exp));
+    // }
+
+    // visitDefineArgsList = (ctx: ArgListContext) => {
+    //     const args = ctx.expression_list();
+    //     if (args.length < 2) {
+    //         this.diagnostics.push({
+    //             range: toRange(ctx),
+    //             message: "defineFunction rquires at least two arguments."
+    //         } as Diagnostic);
+    //     } else {
+    //         const name = args[0].getText();
+    //         this.defines.push(name);
+    //     }
+
+    //     args.forEach(exp => this.visit(exp));
+    // }
 
     visitVariable = (ctx: VariableContext) => {
         const text = ctx.getText();

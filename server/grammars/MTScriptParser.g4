@@ -7,9 +7,47 @@ macro
     ;
 
 bit
-    : TEXT
+    : text
+    | comment
     | macroScript
     ;
+
+comment
+    : OPEN_COMMENT commentText CLOSE_COMMENT
+    ;
+
+commentText
+    //: jsonObject
+    : COMMENT_TEXT*
+    ;
+
+text
+    : TEXT
+    ;
+
+// jsonProperty
+//     : string_literal COLON jsonValue
+//     ;
+
+// jsonValue
+//     : string_literal
+//     | numeric_literal
+//     | jsonObject
+//     | jsonArray
+//     | KEYWORD_TRUE
+//     | KEYWORD_FALSE
+//     | KEYWORD_NULL
+//     ;
+
+// jsonObject
+//     : LBRACE jsonProperty (COMMA jsonProperty)* RBRACE
+//     | LBRACE RBRACE
+//     ;
+
+// jsonArray
+//     : LBRACK jsonValue (COMMA jsonValue)* RBRACK
+//     | LBRACK RBRACK
+//     ;
 
 macroScript
     : (OPEN_SCRIPT | OPEN_SUB_SCRIPT) script CLOSE_SCRIPT

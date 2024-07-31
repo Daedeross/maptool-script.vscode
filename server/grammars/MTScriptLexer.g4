@@ -5,10 +5,26 @@ options { caseInsensitive=true; }
 OPEN_SCRIPT
     : LBRACK -> pushMode(SCRIPT);
 
+OPEN_COMMENT
+    : COMMENT_START -> pushMode(COMMENT);
+
 TEXT
     : .+?;
 
+COMMENT_START : '<!--';
+COMMENT_END : '-->';
+
 DWS : [ \t\r\n\u000C]+  -> channel(HIDDEN); // ignore whitespace outside scripts
+
+mode COMMENT;
+
+CLOSE_COMMENT
+    : COMMENT_END -> popMode;
+
+COMMENT_TEXT
+    : '--' ~'>'
+    | ~'-' .
+    ;
 
 mode SCRIPT;
 
@@ -55,6 +71,7 @@ KEYWORD_CASE        : 'case';
 KEYWORD_DEFAULT     : 'default';
 KEYWORD_TRUE        : 'true';
 KEYWORD_FALSE       : 'false';
+KEYWORD_NULL        : 'null';
 
 // Roll Options
 KEYWORD_CODE        : 'code';
