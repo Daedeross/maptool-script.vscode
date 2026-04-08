@@ -1,9 +1,9 @@
-﻿# YAML file for TextMate grammer 
+# YAML file for TextMate grammer 
 # requires conversion into .json to work in VSCode
 # requires a utility to replace variables, such as https://gist.github.com/leonhard-s/7b668697c9f0755de050cf63729713e5
 name: MapTool Script
 scopeName: source.mts
-fileTypes: [mts]
+fileTypes: [mts, mtmacro]
 uuid: 44e8b0bb-5bab-47c6-bc66-e2bd33e1a0b7
 
 variables:
@@ -109,6 +109,7 @@ variables:
 patterns:
   - include: '#rpedit'
   - include: "#macro"
+  - include: '#embedded-html-fragment'
 repository:
   macro:
     patterns:
@@ -185,6 +186,7 @@ repository:
     - include: '#statement'
   statement:
     patterns:
+    - include: '#embedded-html-fragment'
     - include: '#assignment-statement'
     - include: '#expression'
   assignment-statement:
@@ -297,6 +299,7 @@ repository:
       '2': { name: invalid.illegal.newline.mts }
     patterns:
     - include: '#string-character-escape'
+    - include: '#html-in-string-double'
   qstring-single:
     name: string.quoted.single.mts
     begin: "'"
@@ -308,9 +311,32 @@ repository:
       '2': { name: invalid.illegal.newline.mts }
     patterns:
     - include: '#string-character-escape'
+    - include: '#html-in-string-single'
   string-character-escape:
     name: constant.character.escape.mts
     match: \\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\{[0-9A-Fa-f]+\}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)
+  # Embedded HTML (built-in text.html.basic). Outer double-quoted strings end the
+  # embed at the first unescaped "; use single-quoted literals for HTML with class="...".
+  html-in-string-double:
+    contentName: meta.embedded.block.html
+    begin: '<(?=!--|[a-zA-Z/!?])'
+    end: '"'
+    patterns:
+    - include: text.html.basic
+  html-in-string-single:
+    contentName: meta.embedded.block.html
+    begin: '<(?=!--|[a-zA-Z/!?])'
+    end: "'"
+    patterns:
+    - include: text.html.basic
+  # Raw HTML outside string literals (common in MapTool frame/dialog bodies).
+  # Ends before the next full-line macro start or closing ] of the outer block.
+  embedded-html-fragment:
+    contentName: meta.embedded.block.html
+    begin: '\s*(<(?=!--|[a-zA-Z/!?]))'
+    end: '(?=^\s*\[)|(?=])'
+    patterns:
+    - include: text.html.basic
 
   # binary-expression:
   #   name: meta.expression.binary.mts
@@ -385,6 +411,7 @@ repository:
     patterns:
     - include: '#rpedit-props'
     - include: '#macro'
+    - include: '#embedded-html-fragment'
   rpedit-collapsible:
     begin: '^(@@)[@\s]*(.+)'
     beginCaptures:
@@ -396,6 +423,7 @@ repository:
     patterns:
     - include: '#rpedit-props'
     - include: '#macro'
+    - include: '#embedded-html-fragment'
 
   rpedit-props:
     name: meta.maco.rpedit.props.mts

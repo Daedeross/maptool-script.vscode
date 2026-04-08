@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Variable usage before assignment waring.
   - For-loop argument validation.
 
+## [0.1.4]
+
+### Added
+
+- `.mtmacro` file extension registered for MapTool Script (same grammar and language configuration as `.mts`).
+- **Format Document** for `.mts` / `.mtmacro`: indents macro source by brace nesting.
+- Optional formatting of HTML fragments inside string literals, using the workspace HTML formatter rules for those segments.
+- Settings under **MapTool Script**:
+  - `maptoolScript.format.enable` — toggle Format Document (default: on).
+  - `maptoolScript.format.htmlInSingleQuotedStrings` — format HTML inside single-quoted strings (default: on).
+  - `maptoolScript.format.htmlInDoubleQuotedStrings` — format HTML inside double-quoted strings (default: off; turning on may insert `"` and break the macro string).
+
 ## [0.1.3]
 
 ### Fixed

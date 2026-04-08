@@ -2,7 +2,8 @@
     "name": "MapTool Script",
     "scopeName": "source.mts",
     "fileTypes": [
-        "mts"
+        "mts",
+        "mtmacro"
     ],
     "uuid": "44e8b0bb-5bab-47c6-bc66-e2bd33e1a0b7",
     "patterns": [
@@ -11,6 +12,9 @@
         },
         {
             "include": "#macro"
+        },
+        {
+            "include": "#embedded-html-fragment"
         }
     ],
     "repository": {
@@ -162,6 +166,9 @@
         },
         "statement": {
             "patterns": [
+                {
+                    "include": "#embedded-html-fragment"
+                },
                 {
                     "include": "#assignment-statement"
                 },
@@ -409,6 +416,9 @@
             "patterns": [
                 {
                     "include": "#string-character-escape"
+                },
+                {
+                    "include": "#html-in-string-double"
                 }
             ]
         },
@@ -432,12 +442,45 @@
             "patterns": [
                 {
                     "include": "#string-character-escape"
+                },
+                {
+                    "include": "#html-in-string-single"
                 }
             ]
         },
         "string-character-escape": {
             "name": "constant.character.escape.mts",
             "match": "\\\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\\{[0-9A-Fa-f]+\\}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)"
+        },
+        "html-in-string-double": {
+            "contentName": "meta.embedded.block.html",
+            "begin": "<(?=!--|[a-zA-Z/!?])",
+            "end": "\"",
+            "patterns": [
+                {
+                    "include": "text.html.basic"
+                }
+            ]
+        },
+        "html-in-string-single": {
+            "contentName": "meta.embedded.block.html",
+            "begin": "<(?=!--|[a-zA-Z/!?])",
+            "end": "'",
+            "patterns": [
+                {
+                    "include": "text.html.basic"
+                }
+            ]
+        },
+        "embedded-html-fragment": {
+            "contentName": "meta.embedded.block.html",
+            "begin": "\\s*(<(?=!--|[a-zA-Z/!?]))",
+            "end": "(?=^\\s*\\[)|(?=])",
+            "patterns": [
+                {
+                    "include": "text.html.basic"
+                }
+            ]
         },
         "binary-expression": {
             "patterns": [
@@ -557,6 +600,9 @@
                 },
                 {
                     "include": "#macro"
+                },
+                {
+                    "include": "#embedded-html-fragment"
                 }
             ]
         },
@@ -582,6 +628,9 @@
                 },
                 {
                     "include": "#macro"
+                },
+                {
+                    "include": "#embedded-html-fragment"
                 }
             ]
         },

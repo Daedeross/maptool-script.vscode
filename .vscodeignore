@@ -1,9 +1,15 @@
-# Ignore
+# Ignore everything by default; whitelist packaged files.
 **
 
-# Keep
+!package.json
+!language-configuration.json
 !CHANGELOG.md
 !LICENSE
-!images/
-!syntaxes/
-!language-configuration.json
+!images/**
+!syntaxes/**
+!out/**/*.js
+!node_modules/vscode-html-languageservice/**
+!node_modules/vscode-languageserver-textdocument/**
+!node_modules/vscode-languageserver-types/**
+!node_modules/vscode-uri/**
+!node_modules/@vscode/l10n/**

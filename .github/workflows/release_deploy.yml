@@ -18,6 +18,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install PyYAML
+      - run: npm ci
       - name: Publish to Visual Studio Marketplace
         id: publishToVSCMarketplace
         uses: HaaLeo/publish-vscode-extension@v1.6.2
